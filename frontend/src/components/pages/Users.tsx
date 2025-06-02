@@ -3,7 +3,7 @@ import Div from "../atoms/Div";
 import UserCreate from "../organism/UserCreate";
 import UserTable from "../organism/UserTable";
 
-export default function Users() {
+export default function UsersPage() {
   const [statePage, setStatePage] = useState<'create' | 'edit' | 'view'>('view');
   const userId = 'user-1'
 
