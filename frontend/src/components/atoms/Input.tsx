@@ -1,6 +1,6 @@
 import type { InputProps } from "@/types/input";
 
-export default function InputComponent({
+export default function Input({
   field,
   onInput,
   onBlur,
