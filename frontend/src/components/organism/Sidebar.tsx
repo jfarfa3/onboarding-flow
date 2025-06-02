@@ -43,13 +43,13 @@ export default function Sidebar() {
         <div className="flex items-center">
           {
             isOpen ? (
-            logo.map((letter, index) => (
-              <Letter
-                key={index}
-                letter={letter}
-                firstLetter={index === 0}
-              />
-            ))
+              logo.map((letter, index) => (
+                <Letter
+                  key={index}
+                  letter={letter}
+                  firstLetter={index === 0}
+                />
+              ))
             ) : (
               <Letter letter="OF" firstLetter={true} />
             )

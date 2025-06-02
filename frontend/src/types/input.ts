@@ -6,7 +6,7 @@ export interface InputProps {
 }
 
 export interface FieldConfig {
-  type: 'text' | 'email' | 'tel' | 'password' | 'date' | 'select';
+  type: "text" | "email" | "tel" | "password" | "date" | "select";
   label: string;
   name: string;
   id: string;
@@ -18,7 +18,7 @@ export interface FieldConfig {
   validationMessage?: string;
   min?: number;
   max?: number;
-  state?: 'default' | 'error' | 'success';
+  state?: "default" | "error" | "success";
   options?: Record<string, string>[];
   touched?: boolean;
 }
