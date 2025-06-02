@@ -91,19 +91,19 @@ export default function Dashboard() {
           />
         ))}
       </div>
-      <h2 className="text-3xl font-bold mt-8 mb-4 text-blue-900">
-        Pending Requests
+      <h2 className="text-3xl font-bold mt-8 mb-4 text-blue-900 w-full">
+        Solicitudes Pendientes
       </h2>
-      <div className="flex flex-row gap-6">
-        <section>
+      <div className="flex flex-row gap-6 w-full">
+        <section className="flex-1">
           <h3 className="text-2xl font-semibold mb-4 text-blue-800">
-            Pending Devices
+            Equipos Pendientes
           </h3>
           <PendingDevicesTable />
         </section>
-        <section>
+        <section className="flex-1">
           <h3 className="text-2xl font-semibold mb-4 text-blue-800">
-            Pending Accesses
+            Accesos Pendientes
           </h3>
           <PendingAccessTable />
         </section>
