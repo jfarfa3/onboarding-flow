@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 type SessionStore = {
-  sessionToken: string;
+  sessionToken: string | null;
   setSessionToken: (token: string) => void;
   clearSessionToken: () => void;
 };
@@ -10,9 +10,9 @@ type SessionStore = {
 const useSessionStore = create<SessionStore>()(
   persist(
     (set) => ({
-      sessionToken: "",
+      sessionToken: null,
       setSessionToken: (token: string) => set({ sessionToken: token }),
-      clearSessionToken: () => set({ sessionToken: "" }),
+      clearSessionToken: () => set({ sessionToken: null }),
     }),
     {
       name: "session-storage",
