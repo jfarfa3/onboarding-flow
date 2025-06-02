@@ -1,32 +1,19 @@
 import Letter from "@/components/atoms/Letter";
 import LoginForm from "@/components/organism/Login";
-import useSessionStore from "@/store/sessionStore";
-import { decodeJwtAndCheckExpiration } from "@/utils/jwt";
-import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import Div from "../atoms/Div";
-import { showErrorToast } from "@/utils/toast";
+import useSessionChecker from "@/hooks/useSessionChecker";
 
 export default function Home() {
   const navigate = useNavigate();
   const onboarding = ["ON", "B", "O", "A", "R", "D", "I", "N", "G"];
   const flow = ["F", "L", "O", "W"];
-  const { sessionToken, clearSessionToken } = useSessionStore();
 
-  useEffect(() => {
-    if (sessionToken) {
-      decodeJwtAndCheckExpiration(sessionToken)
-        .then(() => {
-          navigate("/dashboard");
-        })
-        .catch(() => {
-          showErrorToast("Session expired or invalid token. Please log in again.", "session-error");
-          clearSessionToken();
-        });
-    }
-  }, [sessionToken, navigate, clearSessionToken]);
-
-
+  useSessionChecker({
+    onSessionValid: () => {
+      navigate("/dashboard");
+    },
+  });
 
   return (
     <Div>
