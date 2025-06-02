@@ -1,42 +1,80 @@
-import { getPendingAccesses } from "@/data/users"
-import DynamicTable from "../molecules/DynamicTable"
-import { RoleEnum } from "@/types/roles"
-import type { Access } from "@/types/access"
-import type { DynamicColumns } from "@/types/dynamicTable"
+import { getPendingAccesses } from "@/data/users";
+import { RoleEnum } from "@/types/roles";
+import type { Access } from "@/types/access";
+import type { DynamicColumns } from "@/types/dynamicTable";
+import DynamicPendingTable from "../layout/DynamicTable";
+import type { FieldConfig } from "@/types/input";
+
+const columns: DynamicColumns<Access>[] = [
+  {
+    header: "Nombre",
+    accessor: (item) => (
+      <span className="font-medium">
+        {item.user?.name} - {item.user?.email?.split('@')[0]}
+      </span>
+    )
+  },
+  {
+    header: "Rol",
+    accessor: (item) => (
+      <span className="capitalize text-gray-600">
+        {RoleEnum[item.user?.role?.toUpperCase() as keyof typeof RoleEnum] ?? item.user?.role}
+      </span>
+    )
+  },
+  {
+    header: "Software",
+    accessor: (item) => item.software?.name ?? "-"
+  },
+  {
+    header: "Estado",
+    accessor: () => "Pendiente",
+  }
+];
+
+const filterOptions: FieldConfig[] = [
+  {
+    type: "select",
+    label: "Filtrar y ordenar por",
+    name: "sortBy",
+    id: "sortBy",
+    placeholder: "Selecciona una opción",
+    options: [
+      { value: "user.name", label: "Nombre" },
+      { value: "user.role", label: "Rol" },
+      { value: "software.name", label: "Software" },
+    ],
+    state: "default",
+  },
+  {
+    type: "text",
+    label: "Texto a filtrar",
+    name: "filterText",
+    id: "filterText",
+    placeholder: "Ingresa un texto para filtrar",
+    state: "default",
+  },
+  {
+    type: "select",
+    label: "Ordenar por",
+    name: "order",
+    id: "order",
+    placeholder: "Selecciona un orden",
+    options: [
+      { value: "asc", label: "Ascendente" },
+      { value: "desc", label: "Descendente" },
+    ],
+    state: "default",
+  },
+];
 
 export default function PendingAccessTable() {
-  const request = getPendingAccesses()
-  const requestColumns: DynamicColumns<Access>[] = [
-    {
-      header: "Nombre",
-      accessor: (item) => (
-        <span className="font-medium">
-          {item.user?.name} - {item.user?.email?.split('@')[0]}
-        </span>
-      )
-    },
-    {
-      header: "Rol",
-      accessor: (item) => (
-        <span className="capitalize text-gray-600">
-          {RoleEnum[item.user?.role?.toUpperCase() as keyof typeof RoleEnum] ?? item.user?.role}
-        </span>
-      )
-    },
-    {
-      header: "Software",
-      accessor: (item) => item.software?.name ?? "-"
-    },
-    {
-      header: "Estado",
-      accessor: (item) => item.stateRequest ?? "otro"
-    }
-  ];
-
   return (
-    <DynamicTable
-      data={request}
-      columns={requestColumns}
+    <DynamicPendingTable
+      baseRequests={getPendingAccesses()}
+      columns={columns}
+      filterOptions={filterOptions}
+      defaultSortBy="user.name"
       actions={(item) => (
         <div className="flex items-center space-x-2 flex-col">
           <button
@@ -60,5 +98,5 @@ export default function PendingAccessTable() {
         </div>
       )}
     />
-  )
+  );
 }
