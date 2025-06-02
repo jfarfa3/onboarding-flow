@@ -9,7 +9,7 @@ import {
   Menu as MenuIcon
 } from "lucide-react";
 import type { ItemSideBarProps } from "@/types/itemsSidebar";
-import ItemSideBar from "../molecules/itemSideBar";
+import ItemSideBar from "../molecules/ItemSideBar";
 const elementsSideBar: ItemSideBarProps[] = [
   {
     icono: <LayoutDashboard className="w-5 h-5" />,
