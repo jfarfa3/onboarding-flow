@@ -1,5 +1,5 @@
 import type { ItemSideBarProps } from "@/types/itemsSidebar";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { Dot } from "lucide-react";
 
 export default function ItemSideBar({ icono, title, to, isActive = false, showLabel }: ItemSideBarProps) {
