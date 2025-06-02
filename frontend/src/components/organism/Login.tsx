@@ -5,7 +5,7 @@ import useSessionStore from "@/store/sessionStore";
 import type { FieldConfig } from "@/types/input";
 import { generateRoleOptions, type roles } from "@/types/roles";
 import { showErrorToast } from "@/utils/toast";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const loginFormConfig: FieldConfig[][] = [
   [
@@ -50,7 +50,10 @@ export default function LoginForm() {
     const user = getUser(data.usuario, data.rol as roles);
     generateJwt(user).then((token) => {
       setSessionToken(token);
-      navigate("/dashboard");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }
+      , 3000);
     }).catch(() => {
       showErrorToast("Error al generar el token JWT", "jwt-error");
     });
