@@ -231,11 +231,30 @@ export const devices: Devices[] = [
     model: "MacBook Pro 16",
     createdAt: "2023-01-01T12:00:00Z",
     updatedAt: "2023-01-02T12:00:00Z",
-    userId: "user-100",
+    userId: "user-1",
+    stateRequest: "accepted",
+  },
+  {
+    id: "device-19",
+    serialNumber: "SN123456789",
+    model: "MacBook Pro 16",
+    createdAt: "2023-01-01T12:00:00Z",
+    updatedAt: "2023-01-02T12:00:00Z",
+    userId: "user-1",
     stateRequest: "accepted",
   },
   {
     id: "device-2",
+    serialNumber: "SN987654321",
+    model: "Lenovo Cambon X13",
+    so: "Windows 11",
+    createdAt: "2023-01-05T12:00:00Z",
+    updatedAt: "2023-01-06T12:00:00Z",
+    userId: "user-2",
+    stateRequest: "pending",
+  },
+  {
+    id: "device-20",
     serialNumber: "SN987654321",
     model: "Lenovo Cambon X13",
     so: "Windows 11",
@@ -799,4 +818,16 @@ export function getPendingAccesses(): Access[] {
         software: softwareItem || undefined,
       };
     });
+}
+
+export function getAllAccesses(): Access[] {
+  return access.map((access) => {
+    const user = users.find((user) => user.id === access.userId);
+    const softwareItem = software.find((soft) => soft.id === access.softwareId);
+    return {
+      ...access,
+      user: user || undefined,
+      software: softwareItem || undefined,
+    };
+  });
 }
