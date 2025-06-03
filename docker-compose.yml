@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - onboarding_flow-db-data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-dbs.sql
+    container_name: onboarding_flow-db
+
+#   backend:
+#     build:
+#       context: .
+#       dockerfile: docker/Dockerfile
+#     restart: always
+#     ports:
+#       - "8080:80"
+#     environment:
+#       DATABASE_URL: postgres://postgres:password@db:5432/postgres
+#       MAILERSEND_API_KEY: "key"
+#     depends_on:
+#       - db
+#     container_name: cinema-backend
+
+
+volumes:
+  onboarding_flow-db-data:
+    driver: local
+    
