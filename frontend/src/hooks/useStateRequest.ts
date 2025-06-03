@@ -9,7 +9,6 @@ export function useStateRequest() {
     setStateRequest,
     setStateRequestOptions,
     stateRequestOptions,
-    setStateRquestPendingUUID,
   } = useStateRequestStore();
   const { reloadStateRequest, setReloadStateRequest } = useGeneralStore();
 
@@ -28,10 +27,6 @@ export function useStateRequest() {
         const fetchStateRequests = await getStateRequests();
         setStateRequest(fetchStateRequests);
         setReloadStateRequest(false);
-        const pendingState = fetchStateRequests.find(
-          (stateRequest) => stateRequest.label === "Pendiente"
-        );
-        setStateRquestPendingUUID(pendingState ? pendingState.id : null);
         const options: Record<string, string>[] = fetchStateRequests.map(
           (stateRequest) => ({
             label: stateRequest.label,

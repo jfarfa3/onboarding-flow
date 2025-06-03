@@ -45,19 +45,19 @@ const loginFormConfigTemplate: FieldConfig[][] = [
 
 export default function LoginForm() {
   const [formConfig, setFormConfig] = useState<FieldConfig[][]>(loginFormConfigTemplate);
-  const roleOptions = useRoleRequest();
+  const {rolesOptions} = useRoleRequest();
   
   useEffect(() => {
     const updatedConfig = loginFormConfigTemplate.map(row =>
       row.map(field => {
         if (field.name === "rol" && field.type === "select") {
-          return { ...field, options: roleOptions };
+          return { ...field, options: rolesOptions };
         }
         return field;
       })
     );
     setFormConfig(updatedConfig);
-  }, [roleOptions]);
+  }, [rolesOptions]);
 
   const navigate = useNavigate();
   const { setSessionToken } = useSessionStore();
