@@ -32,7 +32,7 @@ export function useSoftwareRequest() {
       }
     };
     fetchSoftware();
-  }, [setSoftware, setSoftwareOptions]);
+  }, [setSoftware, setSoftwareOptions, software]);
 
   return {
     software,

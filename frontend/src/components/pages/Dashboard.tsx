@@ -5,10 +5,10 @@ import { useAllData } from "@/hooks/useAllData";
 import { generateStatCardsData } from "../molecules/generateStatCardsData";
 
 export default function Dashboard() {
-  const { usersDetail, devices, access } = useAllData();
+  const { users, devices, access } = useAllData();
 
   const statCardsData = generateStatCardsData(
-    usersDetail.map(detail => detail.user),
+    users,
     devices,
     access
   );

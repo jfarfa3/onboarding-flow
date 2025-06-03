@@ -1,6 +1,6 @@
 export function filterAndSort<T>(
   data: T[],
-  sortBy: keyof T | string, // Acepta string para rutas anidadas
+  sortBy: keyof T | string,
   direction: "asc" | "desc" = "asc",
   filterText: string,
 ): T[] {

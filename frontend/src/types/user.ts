@@ -1,3 +1,5 @@
+import type { Access } from "./access";
+import type { Devices } from "./devices";
 import type { Roles } from "./roles";
 
 
@@ -13,4 +15,7 @@ export type User = {
   updated_at?: string;
   last_login?: string;
   is_active: boolean;
+
+  devices?:Devices[];
+  access?: Access[];
 };

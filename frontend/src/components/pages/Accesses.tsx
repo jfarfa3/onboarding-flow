@@ -1,8 +1,13 @@
-export default function AccessesPage() {
+import Div from "../atoms/Div";
+import AccessTable from "../organism/AccesTable";
+
+
+export default function Accesses() {
   return (
-    <div>
-      <h1>Accesses</h1>
-      <p>This is the accesses page.</p>
-    </div>
+    <Div>
+      <div className="p-4 text-black">
+        <AccessTable />
+      </div>
+    </Div>
   );
 }

@@ -1,17 +1,17 @@
-import type { UserDetail } from "@/types/userDetail";
+import type { User } from "@/types/user";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 type UserStore = {
-  usersDetail: UserDetail[];
-  setUsersDetail: (usersDetail: UserDetail[]) => void;
+  users: User[];
+  setUsers: (users: User[]) => void;
 };
 
 const useUsersStore = create<UserStore>()(
   persist(
     (set) => ({
-      usersDetail: [],
-      setUsersDetail: (usersDetail: UserDetail[]) => set({ usersDetail}),
+      users: [],
+      setUsers: (users: User[]) => set({ users }),
     }),
     {
       name: "users-storage",

@@ -31,7 +31,7 @@ export default function DynamicTable<T>({
   }, [data, sortConfig]);
 
   const handleSort = (accessor: keyof T | ((item: T) => React.ReactNode)) => {
-    if (typeof accessor !== "string") return; // Solo ordenamos campos de nivel superior
+    if (typeof accessor !== "string") return;
     if (sortConfig.key === accessor) {
       const direction =
         sortConfig.direction === 'asc'

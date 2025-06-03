@@ -4,6 +4,7 @@ import { httpRequest } from "./http";
 const API_BASE = import.meta.env.VITE_API_URL;
 
 export async function createSoftwareRequest(user: Software): Promise<Software> {
+  console.log("URL:", `${API_BASE}software`);
   return httpRequest<Software, Software>(`${API_BASE}software`, user, {
     method: "POST",
   });

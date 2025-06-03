@@ -1,8 +1,6 @@
-import { BadgeCheck, BadgeAlert, ShieldCheck, EllipsisVertical } from 'lucide-react';
-import type { UserDetail } from "@/types/userDetail";
+import { BadgeCheck, BadgeAlert, ShieldCheck } from 'lucide-react';
 import type { DynamicColumns } from "@/types/dynamicTable";
 import type { FieldConfig } from "@/types/input";
-import DynamicFilterTable from "./DynamicFilterTable";
 import { useEffect, useState } from "react";
 import { useRoleRequest } from "@/hooks/useRole";
 import type { User } from "@/types/user";
@@ -14,57 +12,69 @@ import { createDeviceRequest } from '@/services/devices';
 import { useStateRequest } from '@/hooks/useStateRequest';
 import { useSoftwareRequest } from '@/hooks/useSoftware';
 import { useAllData } from '@/hooks/useAllData';
-import { createAccess } from '@/services/access';
+import { createAccessByRol } from '@/services/access';
+import DynamicFilterTable from './DynamicFilterTable';
 
-const columnsTemplate: DynamicColumns<UserDetail>[] = [
+const columnsTemplate: DynamicColumns<User>[] = [
   {
     header: "Nombre",
-    accessor: (item) => (
-      <span className="font-medium">
-        {item.user.name}
-      </span>
-    ),
+    accessor: 'name',
     type: "text",
     key: "name",
+    extractor: (item) => item.name,
+    editable: true,
+    toCreate: true,
   },
   {
     header: "Correo",
     accessor: (item) => (
       <span className="text-gray-500">
-        {item.user.email}
+        {item.email}
       </span>
     ),
     type: "email",
     key: "email",
+    toCreate: true,
+    extractor: (item) => item.email,
+    editable: false,
   },
   {
     header: "Área",
-    accessor: (item) => item.user.area ?? "-",
+    accessor: (item) => item.area ?? "-",
     type: "text",
     key: "area",
+    extractor: (item) => item.area,
+    editable: true,
+    toCreate: true,
   },
   {
     header: "Equipo",
-    accessor: (item) => item.user.team ?? "-",
+    accessor: (item) => item.team ?? "-",
     type: "text",
     key: "team",
+    extractor: (item) => item.team,
+    editable: true,
+    toCreate: true,
   },
   {
     header: "Rol",
     accessor: (item) => (
       <span className="capitalize text-gray-600">
-        {item.user.role?.label || "Sin rol asignado"}
+        {item.role?.label || "Sin rol asignado"}
       </span>
     ),
     type: "select",
     options: [],
-    key: "role",
+    key: "role_id",
+    extractor: (item) => item.role?.id || "",
+    editable: true,
+    toCreate: true,
   },
   {
     header: "Dispositivos asignados",
     accessor: (item) =>
-      item.devices.length > 0 ? (
-        item.devices.some(device => device.state_request?.label === 'Aprobada') ? (
+      item.devices && item.devices.length > 0 ? (
+        item.devices?.some(device => device.state_request?.label === 'Aprobada') ? (
           <div className="flex items-center">
             <BadgeCheck className="w-5 h-5 text-green-500 mr-2" />
           </div>
@@ -80,11 +90,13 @@ const columnsTemplate: DynamicColumns<UserDetail>[] = [
       ),
     type: "checkbox",
     key: "devices",
+    toCreate: true,
+    editable: false,
   },
   {
     header: "Permisos de acceso",
     accessor: (item) =>
-      item.access.length > 0 ? (
+      item.access && item.access.length > 0 ? (
         item.access.some(access => access.state_request?.label === 'Aprobada') ? (
           <div className="flex items-center">
             <BadgeCheck className="w-5 h-5 text-green-500 mr-2" />
@@ -101,11 +113,13 @@ const columnsTemplate: DynamicColumns<UserDetail>[] = [
       ),
     type: "checkbox",
     key: "access",
+    toCreate: true,
+    editable: false,
   },
   {
     header: "Estado",
     accessor: (item) =>
-      item.user.is_active ? (
+      item.is_active ? (
         <div className="flex items-center">
           <ShieldCheck className="w-5 h-5 text-green-500 mr-2" />
           Activo
@@ -116,6 +130,11 @@ const columnsTemplate: DynamicColumns<UserDetail>[] = [
           Inactivo
         </div>
       ),
+    type: "checkbox",
+    key: "isActive",
+    extractor: (item) => item.is_active,
+    editable: true,
+    toCreate: false,
   },
 ]
 
@@ -127,12 +146,12 @@ const filterOptions: FieldConfig[] = [
     id: "sortBy",
     placeholder: "Selecciona una opción",
     options: [
-      { value: "user.name", label: "Nombre" },
-      { value: "user.email", label: "Correo" },
-      { value: "user.role.label", label: "Rol" },
-      { value: "user.area", label: "Área" },
-      { value: "user.team", label: "Equipo" },
-      { value: "user.isActive", label: "Estado" },
+      { value: "name", label: "Nombre" },
+      { value: ".email", label: "Correo" },
+      { value: "role.label", label: "Rol" },
+      { value: "area", label: "Área" },
+      { value: "team", label: "Equipo" },
+      { value: "isActive", label: "Estado" },
       { value: "devices.length", label: "Dispositivos asignados" },
       { value: "access.length", label: "Permisos de acceso" },
     ],
@@ -161,12 +180,12 @@ const filterOptions: FieldConfig[] = [
 ]
 
 export default function UserTable() {
-  const [columns, setColumns] = useState<DynamicColumns<UserDetail>[]>(columnsTemplate);
+  const [columns, setColumns] = useState<DynamicColumns<User>[]>(columnsTemplate);
   const {rolesOptions} = useRoleRequest();
   const {software} = useSoftwareRequest();
   const { roles } = useRolesStore();
   const { stateRequest } = useStateRequest();
-  const { usersDetail, setUsersDetail } = useAllData();
+  const { users, setUsers } = useAllData();
 
   useEffect(() => {
     const updatedColumns = columnsTemplate.map(col => {
@@ -179,13 +198,13 @@ export default function UserTable() {
     setColumns(updatedColumns);
   }, [rolesOptions]);
 
-  const handleSave = async (data: any) => {
+  const handleSave = async (data: User) => {
     const newUser: User = {
       name: data.name as string,
       email: data.email as string,
       area: data.area as string,
       team: data.team as string,
-      role_id: data.role as string,
+      role_id: data.role_id as string,
       last_login: new Date().toISOString(),
       is_active: true,
     }
@@ -197,34 +216,54 @@ export default function UserTable() {
         state_request_id: stateRequest.find(sr => sr.label === "Pendiente")?.id || "",
       }
       const deviceRequestCreated = await createDeviceRequest(newDeviceRequest);
-      const accessRequestCreated = await createAccess(userCreated.id || "", userCreated.role_id, software, stateRequest.find(sr => sr.label === "Pendiente")?.id || "");
-      const userDetail: UserDetail = {
-        user: userCreated,
+      const accessRequestCreated = await createAccessByRol(userCreated.id || "", userCreated.role_id, software, stateRequest.find(sr => sr.label === "Pendiente")?.id || "");
+      const userDetail: User = {
+        ...userCreated,
         devices: [deviceRequestCreated],
-        access: [...accessRequestCreated]
+        access: accessRequestCreated,
       }
-      setUsersDetail([...usersDetail, userDetail]);
+      setUsers([...users, userDetail]);
     } catch {
       showErrorToast("Error al crear el usuario", "create-user-error");
     }
   }
 
+  const handleEdit = async (data: User, item: User) => {
+    console.log("Edit user data:", data, "for item:", item);
+    // try {
+      // TODO:Aquí debes implementar tu lógica para actualizar el usuario (PATCH o PUT)
+    //   const updatedUsersDetail = usersDetail.map(detail => {
+    //     if (detail.user.id === data.id) {
+    //       return {
+    //         ...detail,
+    //         user: {
+    //           ...detail.user,
+    //           name: data.name,
+    //           email: data.email,
+    //           area: data.area,
+    //           team: data.team,
+    //           role_id: data.role,
+    //         },
+    //       };
+    //     }
+    //     return detail;
+    //   });
+    //   setUsersDetail(updatedUsersDetail);
+    // } catch {
+    //   showErrorToast("Error al editar el usuario", "edit-user-error");
+    // }
+  };
+
   return (
     <DynamicFilterTable
-      baseRequests={usersDetail}
+      baseRequests={users}
       columns={columns}
       filterOptions={filterOptions}
       defaultSortBy="user.name"
       onSave={handleSave}
+      onEdit={handleEdit}
       allowAddNew={true}
-      actions={(item) => (
-        <button
-          onClick={() => console.log(`Edit user: ${item.user.id}`)}
-          className="text-gray-500 hover:text-gray-700"
-        >
-          <EllipsisVertical className="w-5 h-5" />
-        </button>
-      )}
+      allowEdit={true}
     />
   )
 }

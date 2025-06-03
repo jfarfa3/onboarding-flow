@@ -1,12 +1,12 @@
 import type { DynamicColumns } from "@/types/dynamicTable";
 import Div from "../atoms/Div";
 import type { Software } from "@/types/software";
-import DynamicFilterTable from "../organism/DynamicFilterTable";
 import { useEffect, useState } from "react";
 import { useRoleRequest } from "@/hooks/useRole";
 import { createSoftwareRequest } from "@/services/software";
 import { useSoftwareRequest } from "@/hooks/useSoftware";
 import { showErrorToast } from "@/utils/toast";
+import DynamicFilterTable from "../organism/DynamicFilterTable";
 
 const softwareColumnsTemplate: DynamicColumns<Software>[] = [
   {
@@ -14,24 +14,32 @@ const softwareColumnsTemplate: DynamicColumns<Software>[] = [
     accessor: "name",
     key: "name",
     type: "text",
+    extractor: (item) => item.name,
+    editable: false,
   },
   {
     header: "Descripción",
     accessor: "description",
     key: "description",
     type: "text",
+    extractor: (item) => item.description || "",
+    editable: true,
   },
   {
     header: "URL",
     accessor: "url",
     key: "url",
     type: "text",
+    extractor: (item) => item.url || "",
+    editable: true,
   },
   {
     header: "Activo",
     accessor: (item) => item.is_active ? "Sí" : "No",
     key: "is_active",
     type: "checkbox",
+    extractor: (item) => item.is_active,
+    editable: true,
   },
   {
     header: "Roles Requeridos",
@@ -43,7 +51,7 @@ const softwareColumnsTemplate: DynamicColumns<Software>[] = [
         <div className="flex flex-wrap gap-2">
           {item.roles.map(role => (
             <span
-              key={role.id} // 🔑 importante usar key cuando mapeas
+              key={role.id}
               className="font-medium bg-blue-300 border-2 rounded px-2 py-1"
             >
               {role.label}
@@ -54,7 +62,9 @@ const softwareColumnsTemplate: DynamicColumns<Software>[] = [
     },
     key: "roles_required",
     type: "multi-select",
-    options: []
+    options: [],
+    extractor: (item) => item.roles?.map(role => role.id) || [],
+    editable: true,
   }
 ];
 
@@ -78,12 +88,18 @@ export default function ConfigPage() {
 
   const saveSoftware = async (data: Software) => {
     try {
+      console.log("Saving software:", data);
       const softwareCreated = await createSoftwareRequest(data);
       setSoftware([...software, softwareCreated]);
-    } catch {
+    } catch (error) {
+      console.error("Error creating software:", error);
       showErrorToast("Error al crear el software", "create-software-error");
     }
   };
+
+  const editSoftware = async (data: Software, originalItem: Software) => {
+    console.log("Edit software functionality not implemented yet", data, originalItem);
+  }
 
 
   return (
@@ -98,9 +114,9 @@ export default function ConfigPage() {
           defaultSortBy="name"
           allowAddNew={true}
           onSave={saveSoftware}
-          actions={() => (
-            <span className="text-gray-500">No hay acciones disponibles</span>
-          )}
+          onEdit={editSoftware}
+          allowEdit={true}
+          canEditRow={(item) => item.is_active}
         />
       </div>
     </Div>

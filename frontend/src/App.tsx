@@ -5,6 +5,8 @@ import { ToastContainer } from "react-toastify";
 import DashboardLayout from "@/components/layout/Dashboard";
 import UsersPage from "@/components/pages/Users";
 import ConfigPage from "./components/pages/Config";
+import Devices from "./components/pages/Devices";
+import Accesses from "./components/pages/Accesses";
 
 export default function App() {
   return (
@@ -15,6 +17,8 @@ export default function App() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="users" element={<UsersPage />} />
+          <Route path="devices" element={<Devices />} />
+          <Route path="accesses" element={<Accesses />} />
           <Route path="settings" element={<ConfigPage />} />
           <Route path="*" element={<Dashboard />} />
         </Route>

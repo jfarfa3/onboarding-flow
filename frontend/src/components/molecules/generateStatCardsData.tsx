@@ -9,28 +9,19 @@ export function generateStatCardsData(
   devices: Devices[],
   access: Access[]
 ): StartCardProps[] {
-  // 1️⃣ Usuarios totales
   const totalUsers = users.length;
-
-  // 2️⃣ Solicitudes de equipo pendientes
   const solicitudesEquipo = devices.filter(device => device.state_request?.label === 'Pendiente').length;
-
-  // 3️⃣ Solicitudes de acceso pendientes
   const solicitudesAcceso = access.filter(acc => acc.state_request?.label === 'Pendiente').length;
-
-  // 4️⃣ Nuevos roles técnicos (Desarrollador, DevOps, Líder Técnico, etc.)
   const rolesTecnicos = ["Desarrollador", "Líder Técnico", "DevOps", "Arquitecto de Software"];
   const nuevosRolesTecnicos = users.filter(user =>
     rolesTecnicos.includes(user.role?.label ?? "")
   ).length;
-
-  // 5️⃣ Chart Data (simulado por ahora)
   const generateChartData = (value: number) => [
-    { value: value - 2 },
-    { value: value - 1 },
+    { value: value + 20 },
+    { value: value - 15 },
     { value },
-    { value: value + 1 },
-    { value: value + 2 }
+    { value: value + 18 },
+    { value: value + 23 }
   ];
 
   return [
@@ -38,7 +29,7 @@ export function generateStatCardsData(
       title: "Usuarios",
       value: totalUsers,
       icon: <UserIcon size={40} />,
-      percentageChange: "+3.2%", // Ajustar si tienes histórico
+      percentageChange: "+3.2%",
       trendIcon: <TrendingUp className="text-green-500" />,
       chartData: generateChartData(totalUsers),
       chartColor: "#3b82f6",

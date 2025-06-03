@@ -3,7 +3,6 @@ import useAccessStore from "@/store/accessStore";
 import useUsersStore from "@/store/userStore";
 import { httpRequest } from "@/services/http";
 import { useEffect } from "react";
-import type { UserDetail } from "@/types/userDetail";
 import type { User } from "@/types/user";
 import type { Devices } from "@/types/devices";
 import type { Access } from "@/types/access";
@@ -13,7 +12,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 export function useAllData() {
   const { setDevices, devices, setDevicesPending } = useDevicesStore();
   const { setAccess, access, setAccessPending } = useAccessStore();
-  const { setUsersDetail, usersDetail } = useUsersStore();
+  const { users, setUsers } = useUsersStore();
 
   useEffect(() => {
     async function fetchData() {
@@ -43,18 +42,18 @@ export function useAllData() {
 
         setDevices(devices);
         setAccess(access);
-        const dataReal: UserDetail[] = allUsers.map((user) => {
+        const dataReal: User[] = allUsers.map((user) => {
           const userDevices = devices.filter(
             (device) => device.user_id === user.id
           );
           const userAccess = access.filter((acc) => acc.user_id === user.id);
           return {
-            user,
+            ...user,
             devices: userDevices,
             access: userAccess,
           };
         });
-        setUsersDetail(dataReal);
+        setUsers(dataReal);
         access.forEach((acc) => {
           const user = allUsers.find((user) => user.id === acc.user_id);
           if (user) {
@@ -84,14 +83,14 @@ export function useAllData() {
   }, [
     setDevices,
     setAccess,
-    setUsersDetail,
     setDevicesPending,
     setAccessPending,
+    setUsers,
   ]);
   return {
     devices,
     access,
-    usersDetail,
-    setUsersDetail,
+    users,
+    setUsers,
   };
 }

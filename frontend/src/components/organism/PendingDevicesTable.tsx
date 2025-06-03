@@ -1,8 +1,8 @@
 import type { DynamicColumns } from "@/types/dynamicTable";
-import DynamicFilterTable from "./DynamicFilterTable"
 import type { Devices } from "@/types/devices";
 import type { FieldConfig } from "@/types/input";
 import useDevicesStore from "@/store/devicesStore";
+import DynamicFilterTable from "./DynamicFilterTable";
 
 const columns: DynamicColumns<Devices>[] = [
   {
@@ -76,28 +76,6 @@ export default function PendingDevicesTable() {
       columns={columns}
       filterOptions={filterOptions}
       defaultSortBy="user.name"
-      actions={(item) => (
-        <div className="flex items-center space-x-2 flex-col">
-          <button
-            className="text-blue-500 hover:text-blue-700"
-            onClick={() => console.log(`View request ${item.id}`)}
-          >
-            View
-          </button>
-          <button
-            className="text-green-500 hover:text-green-700"
-            onClick={() => console.log(`Approve request ${item.id}`)}
-          >
-            Approve
-          </button>
-          <button
-            className="text-red-500 hover:text-red-700"
-            onClick={() => console.log(`Reject request ${item.id}`)}
-          >
-            Reject
-          </button>
-        </div>
-      )}
     />
   )
 }
