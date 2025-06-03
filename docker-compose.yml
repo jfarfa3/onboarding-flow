@@ -11,11 +11,43 @@ services:
       - onboarding_flow-db-data:/var/lib/postgresql/data
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-dbs.sql
     container_name: onboarding_flow-db
+    networks:
+      - onboarding-network
 
-    
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5002:80"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/postgres
+    depends_on:
+      - db
+    container_name: onboarding_flow-backend
+    networks:
+      - onboarding-network
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:5002/
+    restart: always
+    ports:
+      - "5001:80"
+    depends_on:
+      - backend
+    container_name: onboarding_flow-frontend
+    networks:
+      - onboarding-network
 
 volumes:
   onboarding_flow-db-data:
     driver: local
-    
+
+networks:
+  onboarding-network:
+    driver: bridge
