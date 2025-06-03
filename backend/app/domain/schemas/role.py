@@ -4,14 +4,12 @@ from datetime import datetime
 from pydantic import BaseModel
 
 class RoleBase(BaseModel):
-    name: str
     label: str
     
 class RoleCreate(RoleBase):
     pass
 
 class RolePatch(BaseModel):
-    name: Optional[str] = None
     label: Optional[str] = None
     
 class RoleUpdate(RolePatch):

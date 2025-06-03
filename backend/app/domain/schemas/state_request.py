@@ -4,14 +4,12 @@ from datetime import datetime
 from typing import Optional
 
 class StateRequestBase(BaseModel):
-    state: str
     label: str
 
 class StateRequestCreate(StateRequestBase):
     pass
 
 class StateRequestPatch(BaseModel):
-    state: Optional[str] = None
     label: Optional[str] = None
 
 class StateRequestUpdate(StateRequestPatch):

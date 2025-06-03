@@ -2,6 +2,7 @@ from typing import Optional
 from uuid import UUID as UUIDType
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
+from app.domain.schemas.role import RoleResponse
 
 class UserBase(BaseModel):
     name: str
@@ -31,6 +32,7 @@ class UserResponse(UserBase):
     id: UUIDType
     created_at: datetime
     updated_at: datetime
+    role: RoleResponse
 
     class Config:
         from_attributes = True

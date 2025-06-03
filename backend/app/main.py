@@ -11,7 +11,8 @@ from app.infrastructure.api.routes import (
     software_router,
     access_router,
     state_request_router,
-    health_router
+    health_router,
+    all_data_router
 )
 
 logger = get_logger("main")
@@ -40,3 +41,4 @@ app.include_router(role_router.router)
 app.include_router(software_router.router)
 app.include_router(state_request_router.router)
 app.include_router(access_router.router)
+app.include_router(all_data_router.router)

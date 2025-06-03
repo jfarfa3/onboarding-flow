@@ -9,7 +9,7 @@ class Device(Base, TimestampMixin):
 
     serial_number = Column(String, nullable=True)
     model = Column(String, nullable=True)
-    system_operating = Column(String, nullable=False)
+    system_operating = Column(String, nullable=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
     state_request_id = Column(UUID(as_uuid=True), ForeignKey('state_requests.id'), nullable=False)
 

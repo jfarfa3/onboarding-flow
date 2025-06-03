@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.domain.models.user import User
 from app.domain.schemas.user import UserUpdate
 
@@ -9,7 +9,7 @@ def create_user(db: Session, user: User):
     return user
 
 def get_all_users(db: Session):
-    return db.query(User).all()
+    return db.query(User).options(joinedload(User.role)).all()
 
 def get_user_by_id(db: Session, user_id: str):
     return db.query(User).filter(User.id == user_id).first()

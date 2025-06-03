@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.domain.models.access import Access
 from app.domain.schemas.access import AccessUpdate
 
@@ -9,7 +9,10 @@ def create_access(db: Session, access: Access):
     return access
 
 def get_all_accesses(db: Session):
-    return db.query(Access).all()
+    return db.query(Access).options(
+        joinedload(Access.software),
+        joinedload(Access.state_request),
+    ).all()
 
 def get_access_by_id(db: Session, access_id: str):
     return db.query(Access).filter(Access.id == access_id).first()
