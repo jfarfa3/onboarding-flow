@@ -1,4 +1,4 @@
-export interface Roles {
+export interface StateRequest {
   label: string;
   id: string;
   created_at: string;

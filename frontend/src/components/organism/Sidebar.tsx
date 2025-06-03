@@ -6,7 +6,8 @@ import {
   User,
   Key,
   Monitor,
-  Menu as MenuIcon
+  Cog,
+  Menu,
 } from "lucide-react";
 import type { ItemSideBarProps } from "@/types/itemsSidebar";
 import ItemSideBar from "../molecules/ItemSideBar";
@@ -30,6 +31,11 @@ const elementsSideBar: ItemSideBarProps[] = [
     icono: <Monitor className="w-5 h-5" />,
     title: "Equipos",
     to: "/dashboard/devices",
+  },
+  {
+    icono: <Cog className="w-5 h-5" />,
+    title: "Configuración",
+    to: "/dashboard/settings",
   }
 ]
 
@@ -59,7 +65,7 @@ export default function Sidebar() {
           onClick={toggleSidebar}
           className="ml-2 p-2 rounded hover:bg-blue-100 transition-colors duration-200"
         >
-          <MenuIcon className="w-6 h-6 text-blue-500" />
+          <Menu className="w-6 h-6 text-blue-500" />
         </button>
       </div>
       <nav className="flex-1 mt-5">

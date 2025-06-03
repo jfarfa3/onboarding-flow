@@ -1,12 +1,14 @@
-import type { roles } from "./roles";
+import type { Roles } from "./roles";
 
 export type Software = {
-  id: string;
   name: string;
   description: string;
   url: string;
-  createdAt: string;
-  updatedAt: string;
-  isActive: boolean;
-  role: roles[];
+  is_active: boolean;
+  roles_required?: string[];
+
+  roles?:Roles[];
+  id?: string;
+  created_at?: string;
+  updated_at?: string;
 };

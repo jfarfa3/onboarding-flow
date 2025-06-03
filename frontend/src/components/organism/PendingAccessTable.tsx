@@ -1,9 +1,8 @@
-import { getPendingAccesses } from "@/data/users";
-import { RoleEnum } from "@/types/roles";
 import type { Access } from "@/types/access";
 import type { DynamicColumns } from "@/types/dynamicTable";
-import DynamicPendingTable from "../layout/DynamicTable";
+import DynamicFilterTable from "./DynamicFilterTable";
 import type { FieldConfig } from "@/types/input";
+import useAccessStore from "@/store/accessStore";
 
 const columns: DynamicColumns<Access>[] = [
   {
@@ -18,7 +17,7 @@ const columns: DynamicColumns<Access>[] = [
     header: "Rol",
     accessor: (item) => (
       <span className="capitalize text-gray-600">
-        {RoleEnum[item.user?.role?.toUpperCase() as keyof typeof RoleEnum] ?? item.user?.role}
+        {item.user?.role?.label || "Sin rol asignado"}
       </span>
     )
   },
@@ -41,7 +40,7 @@ const filterOptions: FieldConfig[] = [
     placeholder: "Selecciona una opción",
     options: [
       { value: "user.name", label: "Nombre" },
-      { value: "user.role", label: "Rol" },
+      { value: "user.role.label", label: "Rol" },
       { value: "software.name", label: "Software" },
     ],
     state: "default",
@@ -69,9 +68,10 @@ const filterOptions: FieldConfig[] = [
 ];
 
 export default function PendingAccessTable() {
+  const { accessPending } = useAccessStore();
   return (
-    <DynamicPendingTable
-      baseRequests={getPendingAccesses()}
+    <DynamicFilterTable
+      baseRequests={accessPending}
       columns={columns}
       filterOptions={filterOptions}
       defaultSortBy="user.name"

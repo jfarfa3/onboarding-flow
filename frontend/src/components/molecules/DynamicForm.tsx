@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { DynamicFormProps } from "@/types/dynamicForm";
 import type { FieldConfig } from "@/types/input";
 import Input from "../atoms/Input";
@@ -17,6 +17,10 @@ export default function DynamicForm({ config, onSubmit }: DynamicFormProps) {
     e.preventDefault();
     onSubmit(formState);
   };
+
+  useEffect(() => {
+    setConfigState(config);
+  }, [config]);
 
   const handleInput = (name: string, value: string) => {
     setFormState((prevState) => ({
@@ -104,35 +108,37 @@ export default function DynamicForm({ config, onSubmit }: DynamicFormProps) {
   }
 
   return (
-    <form
-      className="flex flex-col gap-4 justify-center items-center"
-      onSubmit={handleSubmit}>
-      {configState.map((row, rowIndex) => (
-        <div
-          key={rowIndex}
-          className="grid gap-4 w-full sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-          style={{ gridTemplateColumns: `repeat(${row.length}, 1fr)` }}
-        >
-          {row.map((field) => (
-            <Input
-              key={field.id}
-              field={field}
-              onInput={handleInput}
-              onBlur={handleBlur}
-              onFocus={handleFocus}
-            />
-          ))}
+    <>
+      <form
+        className="flex flex-col gap-4 justify-center items-center"
+        onSubmit={handleSubmit}>
+        {configState.map((row, rowIndex) => (
+          <div
+            key={rowIndex}
+            className="grid gap-4 w-full sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            style={{ gridTemplateColumns: `repeat(${row.length}, 1fr)` }}
+          >
+            {row.map((field) => (
+              <Input
+                key={field.id}
+                field={field}
+                onInput={handleInput}
+                onBlur={handleBlur}
+                onFocus={handleFocus}
+              />
+            ))}
+          </div>
+        ))}
+        <div className="flex justify-center w-full">
+          <button
+            type="submit"
+            disabled={buttonState === 'disabled'}
+            className="w-full p-2 px-10 text-white rounded-l-sm flex justify-center bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200 ease-in-out rounded-md disabled:cursor-not-allowed"
+          >
+            Enviar
+          </button>
         </div>
-      ))}
-      <div className="flex justify-center w-full">
-        <button
-          type="submit"
-          disabled={buttonState === 'disabled'}
-          className="w-full p-2 px-10 text-white rounded-l-sm flex justify-center bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200 ease-in-out rounded-md disabled:cursor-not-allowed"
-        >
-          Enviar
-        </button>
-      </div>
-    </form>
+      </form>
+    </>
   );
 };

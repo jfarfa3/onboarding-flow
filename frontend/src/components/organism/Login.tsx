@@ -3,11 +3,12 @@ import { getUser } from "@/mocks/users";
 import DynamicForm from "@/components/molecules/DynamicForm";
 import useSessionStore from "@/store/sessionStore";
 import type { FieldConfig } from "@/types/input";
-import { generateRoleOptions, type roles } from "@/types/roles";
 import { showErrorToast } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useRoleRequest } from "@/hooks/useRole";
 
-const loginFormConfig: FieldConfig[][] = [
+const loginFormConfigTemplate: FieldConfig[][] = [
   [
     {
       type: "text",
@@ -24,8 +25,7 @@ const loginFormConfig: FieldConfig[][] = [
       type: "select",
       label: "Selecciona tu rol",
       placeholder: "Selecciona tu rol",
-      value: 'dev' as roles,
-      options: generateRoleOptions(),
+      options: [],
       required: true
     }
   ],
@@ -44,16 +44,31 @@ const loginFormConfig: FieldConfig[][] = [
 ] as const;
 
 export default function LoginForm() {
+  const [formConfig, setFormConfig] = useState<FieldConfig[][]>(loginFormConfigTemplate);
+  const roleOptions = useRoleRequest();
+  
+  useEffect(() => {
+    const updatedConfig = loginFormConfigTemplate.map(row =>
+      row.map(field => {
+        if (field.name === "rol" && field.type === "select") {
+          return { ...field, options: roleOptions };
+        }
+        return field;
+      })
+    );
+    setFormConfig(updatedConfig);
+  }, [roleOptions]);
+
   const navigate = useNavigate();
   const { setSessionToken } = useSessionStore();
   const handleLoginSubmit = (data: Record<string, string>) => {
-    const user = getUser(data.usuario, data.rol as roles);
+    const user = getUser(data.usuario, data.rol);
     generateJwt(user).then((token) => {
       setSessionToken(token);
       setTimeout(() => {
         navigate("/dashboard");
       }
-      , 3000);
+        , 3000);
     }).catch(() => {
       showErrorToast("Error al generar el token JWT", "jwt-error");
     });
@@ -62,7 +77,7 @@ export default function LoginForm() {
   return (
     <div className="w-full max-w-md mx-auto p-6 bg-white rounded-lg text-black">
       <h2>Iniciar Sesión</h2>
-      <DynamicForm config={loginFormConfig} onSubmit={handleLoginSubmit} />
+      <DynamicForm config={formConfig} onSubmit={handleLoginSubmit} />
     </div>
   );
 };

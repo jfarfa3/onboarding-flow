@@ -1,8 +1,9 @@
 import type { FieldConfig } from "@/types/input";
 import DynamicForm from "../molecules/DynamicForm";
-import { generateRoleOptions } from "@/types/roles";
+import { useEffect, useState } from "react";
+import { useRoleRequest } from "@/hooks/useRole";
 
-const userFormConfig: FieldConfig[][] = [
+const userFormConfigTemplate: FieldConfig[][] = [
   [
     {
       type: "text",
@@ -51,7 +52,7 @@ const userFormConfig: FieldConfig[][] = [
       id: "rol",
       placeholder: "Selecciona un rol",
       required: true,
-      options: generateRoleOptions(),
+      options: [],
       validationMessage: "Selecciona un rol válido"
     }
   ],
@@ -69,12 +70,28 @@ const userFormConfig: FieldConfig[][] = [
 ];
 
 export default function UserCreate() {
+  const [formConfig, setFormConfig] = useState<FieldConfig[][]>(userFormConfigTemplate);
+  const roleOptions = useRoleRequest();
+
+  
+  useEffect(() => {
+    const updatedConfig = userFormConfigTemplate.map(row =>
+      row.map(field => {
+        if (field.name === "rol" && field.type === "select") {
+          return { ...field, options: roleOptions };
+        }
+        return field;
+      })
+    );
+    setFormConfig(updatedConfig);
+  }, [roleOptions]);
+
   const handleSubmit = (data: Record<string, string>) => {
     console.log("Datos del formulario:", data);
   };
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded shadow text-black">
-      <DynamicForm config={userFormConfig} onSubmit={handleSubmit} />
+      <DynamicForm config={formConfig} onSubmit={handleSubmit} />
     </div>
 
   );

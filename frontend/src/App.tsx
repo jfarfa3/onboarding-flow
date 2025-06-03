@@ -4,6 +4,7 @@ import Dashboard from "@/components/pages/Dashboard";
 import { ToastContainer } from "react-toastify";
 import DashboardLayout from "@/components/layout/Dashboard";
 import UsersPage from "@/components/pages/Users";
+import ConfigPage from "./components/pages/Config";
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="users" element={<UsersPage />} />
+          <Route path="settings" element={<ConfigPage />} />
           <Route path="*" element={<Dashboard />} />
         </Route>
       </Routes>

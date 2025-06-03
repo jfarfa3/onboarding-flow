@@ -1,9 +1,8 @@
 import type { DynamicColumns } from "@/types/dynamicTable";
-import DynamicPendingTable from "../layout/DynamicTable"
+import DynamicFilterTable from "./DynamicFilterTable"
 import type { Devices } from "@/types/devices";
 import type { FieldConfig } from "@/types/input";
-import { getPendingDevices } from "@/data/users";
-import { RoleEnum } from "@/types/roles";
+import useDevicesStore from "@/store/devicesStore";
 
 const columns: DynamicColumns<Devices>[] = [
   {
@@ -18,7 +17,7 @@ const columns: DynamicColumns<Devices>[] = [
     header: "Rol",
     accessor: (item) => (
       <span className="capitalize text-gray-600">
-        {RoleEnum[item.user?.role?.toUpperCase() as keyof typeof RoleEnum] ?? item.user?.role}
+        {item.user?.role?.label || "Sin rol asignado"}
       </span>
     )
   },
@@ -41,7 +40,7 @@ const filterOptions: FieldConfig[] = [
     placeholder: "Selecciona una opción",
     options: [
       { value: "user.name", label: "Nombre" },
-      { value: "user.role", label: "Rol" },
+      { value: "user.role.label", label: "Rol" },
       { value: "model", label: "Modelo" },
       { value: "stateRequest", label: "Estado" },
     ],
@@ -70,34 +69,35 @@ const filterOptions: FieldConfig[] = [
 ];
 
 export default function PendingDevicesTable() {
+  const { devicesPending } = useDevicesStore();
   return (
-      <DynamicPendingTable
-        baseRequests={getPendingDevices()}
-        columns={columns}
-        filterOptions={filterOptions}
-        defaultSortBy="user.name"
-        actions={(item) => (
-          <div className="flex items-center space-x-2 flex-col">
-            <button
-              className="text-blue-500 hover:text-blue-700"
-              onClick={() => console.log(`View request ${item.id}`)}
-            >
-              View
-            </button>
-            <button
-              className="text-green-500 hover:text-green-700"
-              onClick={() => console.log(`Approve request ${item.id}`)}
-            >
-              Approve
-            </button>
-            <button
-              className="text-red-500 hover:text-red-700"
-              onClick={() => console.log(`Reject request ${item.id}`)}
-            >
-              Reject
-            </button>
-          </div>
-        )}
-      />
+    <DynamicFilterTable
+      baseRequests={devicesPending}
+      columns={columns}
+      filterOptions={filterOptions}
+      defaultSortBy="user.name"
+      actions={(item) => (
+        <div className="flex items-center space-x-2 flex-col">
+          <button
+            className="text-blue-500 hover:text-blue-700"
+            onClick={() => console.log(`View request ${item.id}`)}
+          >
+            View
+          </button>
+          <button
+            className="text-green-500 hover:text-green-700"
+            onClick={() => console.log(`Approve request ${item.id}`)}
+          >
+            Approve
+          </button>
+          <button
+            className="text-red-500 hover:text-red-700"
+            onClick={() => console.log(`Reject request ${item.id}`)}
+          >
+            Reject
+          </button>
+        </div>
+      )}
+    />
   )
 }

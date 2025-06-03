@@ -7,3 +7,9 @@ export type UserDetail = {
   devices: Devices[];
   access: Access[];
 };
+
+export type AllData = {
+  users: User[];
+  devices: Devices[];
+  access: Access[];
+}

@@ -1,6 +1,6 @@
 import { Line, LineChart, ResponsiveContainer } from "recharts";
 
-interface StartCardProps {
+export interface StartCardProps {
   title: string;
   value: string | number;
   icon: React.ReactNode;

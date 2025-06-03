@@ -1,13 +1,17 @@
 import type { Software } from "./software";
+import type { StateRequest } from "./stateRequest";
 import type { User } from "./user";
 
 export type Access = {
-  id: string;
-  userId: string;
+  user_id: string;
+  software_id: string;
+  state_request_id: string;
+
+  id?: string;
+  created_at?: string;
+  updated_at?: string;
+
   user?: User;
-  softwareId: string;
   software?: Software;
-  createdAt: string;
-  updatedAt: string;
-  stateRequest: "pending" | "accepted" | "rejected";
+  state_request?: StateRequest;
 };
