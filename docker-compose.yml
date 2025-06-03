@@ -22,7 +22,7 @@ services:
     ports:
       - "5002:80"
     environment:
-      - DATABASE_URL=postgresql://postgres:password@db:5432/postgres
+      - DATABASE_URL=postgresql://postgres:password@db:5432/onboarding_flow
     depends_on:
       - db
     container_name: onboarding_flow-backend
