@@ -1,9 +1,10 @@
 import type { User } from "@/types/user";
 import { httpRequest } from "./http";
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 export async function createUser(user: User): Promise<User> {
-  const url = 'http://localhost:8000/users';
-  return httpRequest<User, User>(url, user, {
-    method: 'POST',
+  return httpRequest<User, User>(`${API_BASE}users`, user, {
+    method: "POST",
   });
 }

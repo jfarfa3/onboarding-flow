@@ -35,7 +35,9 @@ export default function DynamicFilterTable<T>({
   const handleAddClick = () => {
     const emptyRecord: Partial<T> = {};
     columns.forEach(col => {
-      (emptyRecord as any)[col.key] = col.type === "multi-select" ? [] : "";
+      if (col.key) {
+        (emptyRecord as any)[col.key] = col.type === "multi-select" ? [] : "";
+      }
     });
     setNewRecord(emptyRecord);
   };
@@ -43,21 +45,14 @@ export default function DynamicFilterTable<T>({
   const handleInputChange = (
     key: string,
     value: string | string[] | boolean,
-    type?: string
+    // type?: string
   ) => {
     if (!newRecord) return;
 
-    if (type === "multi-select" && Array.isArray(value)) {
-      setNewRecord((prev) => ({
-        ...prev,
-        [key]: value,
-      }));
-    } else {
-      setNewRecord((prev) => ({
-        ...prev,
-        [key]: value,
-      }));
-    }
+    setNewRecord((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
   };
 
   const handleSave = async () => {
@@ -91,18 +86,16 @@ export default function DynamicFilterTable<T>({
 
   return (
     <div className="flex flex-col w-full text-black">
-      {
-        filterOptions && filterOptions.length > 0 && (
-          <DynamicFilterForm
-            config={[updatedFilterOptions]}
-            onFilterChange={(name, value) => {
-              if (name === "sortBy") setSortBy(value);
-              else if (name === "order") setOrder(value as "asc" | "desc");
-              else if (name === "filterText") setFilterText(value);
-            }}
-          />
-        )
-      }
+      {filterOptions && filterOptions.length > 0 && (
+        <DynamicFilterForm
+          config={[updatedFilterOptions]}
+          onFilterChange={(name, value) => {
+            if (name === "sortBy") setSortBy(value);
+            else if (name === "order") setOrder(value as "asc" | "desc");
+            else if (name === "filterText") setFilterText(value);
+          }}
+        />
+      )}
       {allowAddNew && (
         <div className="flex justify-end mb-4">
           {!newRecord && (
@@ -120,55 +113,59 @@ export default function DynamicFilterTable<T>({
           <div className="flex gap-2 w-full flex-row">
             {columns
               .filter(col => col.key)
-              .map(col => (
-                <div key={col.key || col.header} className="flex flex-col w-full justify-center items-center">
-                  <label className="text-sm">{col.header}</label>
-                  {col.type === "multi-select" && col.options ? (
-                    <select
-                      multiple
-                      value={(newRecord as any)[col.key] || []}
-                      onChange={(e) => {
-                        const selectedValues = Array.from(e.target.selectedOptions).map((option) => option.value);
-                        handleInputChange(col.key, selectedValues, col.type);
-                      }}
-                      className="border border-gray-300 rounded w-full p-2"
-                    >
-                      {col.options.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                  ) : col.type === "select" && col.options ? (
-                    <select
-                      value={(newRecord as any)[col.key] || ""}
-                      onChange={(e) => handleInputChange(col.key, e.target.value)}
-                      className="border border-gray-300 rounded w-full p-2"
-                    >
-                      <option value="">Seleccione...</option>
-                      {col.options.map(opt => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                  ) : col.type === "checkbox" ? (
-                    <input
-                      type="checkbox"
-                      checked={Boolean((newRecord as any)[col.key])}
-                      onChange={(e) => handleInputChange(col.key, e.target.checked)}
-                      className="border border-gray-300 rounded w-5 h-5 p-2"
-                    />
-                  ) : (
-                    <input
-                      type={col.type || "text"}
-                      value={(newRecord as any)[col.key] || ""}
-                      onChange={(e) => handleInputChange(col.key, e.target.value)}
-                      className="border border-gray-300 rounded w-full p-2"
-                    />
-                  )}
-                </div>
-              ))}
+              .map(col => {
+                if (!col.key) return null;
+                const key = col.key;
+                return (
+                  <div key={key} className="flex flex-col w-full justify-center items-center">
+                    <label className="text-sm">{col.header}</label>
+                    {col.type === "multi-select" && col.options ? (
+                      <select
+                        multiple
+                        value={(newRecord as any)[key] || []}
+                        onChange={(e) => {
+                          const selectedValues = Array.from(e.target.selectedOptions).map((option) => option.value);
+                          handleInputChange(key, selectedValues);
+                        }}
+                        className="border border-gray-300 rounded w-full p-2"
+                      >
+                        {col.options.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : col.type === "select" && col.options ? (
+                      <select
+                        value={(newRecord as any)[key] || ""}
+                        onChange={(e) => handleInputChange(key, e.target.value)}
+                        className="border border-gray-300 rounded w-full p-2"
+                      >
+                        <option value="">Seleccione...</option>
+                        {col.options.map(opt => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : col.type === "checkbox" ? (
+                      <input
+                        type="checkbox"
+                        checked={Boolean((newRecord as any)[key])}
+                        onChange={(e) => handleInputChange(key, e.target.checked)}
+                        className="border border-gray-300 rounded w-5 h-5 p-2"
+                      />
+                    ) : (
+                      <input
+                        type={col.type || "text"}
+                        value={(newRecord as any)[key] || ""}
+                        onChange={(e) => handleInputChange(key, e.target.value)}
+                        className="border border-gray-300 rounded w-full p-2"
+                      />
+                    )}
+                  </div>
+                );
+              })}
             <div className="flex gap-2 mt-2">
               <button
                 onClick={handleSave}

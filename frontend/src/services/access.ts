@@ -2,6 +2,8 @@ import type { Access } from "@/types/access"
 import type { Software } from "@/types/software";
 import { httpRequest } from "./http";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export async function createAccess(userId: string, roleId: string, software: Software[], stateID: string) {
   const softwareFiltered = software.filter((s) => s.roles?.some((r) => r.id === roleId));
   if (softwareFiltered.length === 0) {
@@ -23,8 +25,7 @@ export async function createAccess(userId: string, roleId: string, software: Sof
 }
 
 export async function createAccessRequest(user: Access): Promise<Access> {
-  const url = "http://localhost:8000/access";
-  return httpRequest<Access, Access>(url, user, {
+  return httpRequest<Access, Access>(`${API_URL}access`, user, {
     method: "POST",
   });
 }

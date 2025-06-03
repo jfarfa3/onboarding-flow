@@ -1,11 +1,10 @@
 import { httpRequest } from "./http";
 import type { StateRequest } from "@/types/stateRequest";
 
-const API_BASE = 'http://localhost:8000/'
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export async function getStateRequests(): Promise<StateRequest[]> {
-  const url = `${API_BASE}state-requests`;
-  return httpRequest<null, StateRequest[]>(url, null, {
-    method: 'GET',
+  return httpRequest<null, StateRequest[]>(`${API_BASE}state-requests`, null, {
+    method: "GET",
   });
 }

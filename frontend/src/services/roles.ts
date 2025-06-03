@@ -1,11 +1,10 @@
 import type { Roles } from "@/types/roles";
 import { httpRequest } from "./http";
 
-const API_BASE = 'http://localhost:8000/'
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export async function getRoles(): Promise<Roles[]> {
-  const url = `${API_BASE}roles`;
-  return httpRequest<null, Roles[]>(url, null, {
-    method: 'GET',
+  return httpRequest<null, Roles[]>(`${API_BASE}roles`, null, {
+    method: "GET",
   });
 }

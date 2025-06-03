@@ -8,7 +8,7 @@ import type { User } from "@/types/user";
 import type { Devices } from "@/types/devices";
 import type { Access } from "@/types/access";
 
-const API_URL = "http://localhost:8000/";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export function useAllData() {
   const { setDevices, devices, setDevicesPending } = useDevicesStore();

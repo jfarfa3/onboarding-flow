@@ -1,16 +1,16 @@
 import type { Software } from "@/types/software";
 import { httpRequest } from "./http";
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 export async function createSoftwareRequest(user: Software): Promise<Software> {
-  const url = "http://localhost:8000/software";
-  return httpRequest<Software, Software>(url, user, {
+  return httpRequest<Software, Software>(`${API_BASE}software`, user, {
     method: "POST",
   });
 }
 
 export async function getAllSoftwareRequests(): Promise<Software[]> {
-  const url = "http://localhost:8000/software";
-  return httpRequest<null, Software[]>(url, null, {
+  return httpRequest<null, Software[]>(`${API_BASE}software`, null, {
     method: "GET",
   });
 }
