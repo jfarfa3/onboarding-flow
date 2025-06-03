@@ -17,7 +17,6 @@ from app.infrastructure.api.routes import (
 
 logger = get_logger("main")
 
-
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 app = FastAPI(title="Gestion de Usuarios, Equipos y Accesos")
@@ -30,10 +29,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.on_event("startup")
 async def startup_event():
     init_db()
-    
+
 app.include_router(health_router.router)
 app.include_router(user_router.router)
 app.include_router(device_router.router)
