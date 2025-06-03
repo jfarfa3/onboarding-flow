@@ -10,6 +10,7 @@ from app.infrastructure.api.routes import (
     role_router,
     software_router,
     access_router,
+    state_request_router,
     health_router
 )
 
@@ -37,4 +38,5 @@ app.include_router(user_router.router)
 app.include_router(device_router.router)
 app.include_router(role_router.router)
 app.include_router(software_router.router)
+app.include_router(state_request_router.router)
 app.include_router(access_router.router)
