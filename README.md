@@ -164,7 +164,7 @@ El backend sigue los principios de **Arquitectura Limpia (Clean Architecture)**:
 
 ```bash
 # Clonar el repositorio
-git clone <repository-url>
+git clone https://github.com/jfarfa3/onboarding-flow.git
 cd onboarding-flow
 
 # Ejecutar todos los servicios
