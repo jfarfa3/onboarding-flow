@@ -26,7 +26,7 @@ export default function LoginForm() {
   const { users } = useAllData();
 
   useEffect(() => {
-    const userOptions = users.map((user) => ({ value: user.id || '', label: user.name }));
+    const userOptions = users.map((user) => ({ value: user.id || '', label: `${user.name} (${user.role?.label})` }));
     const updatedConfig: FieldConfig[][] = loginFormConfigTemplate.map((row) =>
       row.map((field) => {
         if (field.name === "usuario" && field.type === "select") {
