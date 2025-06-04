@@ -4,19 +4,46 @@ from app.infrastructure.database.repositories.device_repository import (
 )
 from app.domain.models.device import Device
 from app.domain.schemas.device import DeviceCreate, DeviceUpdate
+from app.config.logger import get_logger
+
+logger = get_logger("use_cases.device")
 
 def create_device_use_case(db: Session, device_data: DeviceCreate):
+    logger.debug(f"create_device_use_case called with data: {device_data.dict()}")
     device = Device(**device_data.dict())
-    return create_device(db, device)
+    created = create_device(db, device)
+    logger.info(f"Device created successfully - ID: {created.id}")
+    return created
 
 def update_device_use_case(db: Session, device_id: str, device_data: DeviceUpdate):
-    return update_device(db, device_id, device_data)
+    logger.debug(f"update_device_use_case called with id: {device_id}, data: {device_data.dict(exclude_unset=True)}")
+    updated = update_device(db, device_id, device_data)
+    if updated:
+        logger.info(f"Device updated successfully - ID: {device_id}")
+    else:
+        logger.warning(f"Device not found - ID: {device_id}")
+    return updated
 
 def get_all_devices_use_case(db: Session):
-    return get_all_devices(db)
+    logger.debug("get_all_devices_use_case called")
+    devices = get_all_devices(db)
+    logger.info(f"Retrieved {len(devices)} devices")
+    return devices
 
 def get_device_by_id_use_case(db: Session, device_id: str):
-    return get_device_by_id(db, device_id)
+    logger.debug(f"get_device_by_id_use_case called with id: {device_id}")
+    device = get_device_by_id(db, device_id)
+    if device:
+        logger.info(f"Device found - ID: {device_id}")
+    else:
+        logger.warning(f"Device not found - ID: {device_id}")
+    return device
 
 def delete_device_use_case(db: Session, device_id: str):
-    return delete_device(db, device_id)
+    logger.debug(f"delete_device_use_case called with id: {device_id}")
+    result = delete_device(db, device_id)
+    if result:
+        logger.info(f"Device deleted successfully - ID: {device_id}")
+    else:
+        logger.warning(f"Device not found for deletion - ID: {device_id}")
+    return result

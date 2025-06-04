@@ -148,35 +148,38 @@ def _get_current_software_roles(current_software) -> Set[str]:
 
 
 def create_software_service(db: Session, software_data: SoftwareCreateRequest):
+    logger.debug(f"Entrando a create_software_service con datos: {software_data.dict()}")
     logger.info(f"Iniciando el proceso de creación de software - Nombre: {getattr(software_data, 'name', 'N/A')}")
-    logger.info(f"Datos de entrada del software: {software_data}")
-    
+    logger.debug(f"Datos de entrada del software: {software_data}")
+     
     try:
         # Validar roles requeridos
         roles_required = software_data.roles_required
         if not roles_required:
-            logger.error("No se proporcionaron roles requeridos para el software")
+            logger.warning("No se proporcionaron roles requeridos para el software")
             raise HTTPException(status_code=400, detail="Debe proporcionar al menos un rol requerido")
 
-        logger.info(f"Validación exitosa - Roles requeridos ({len(roles_required)}): {roles_required}")
-        
+        logger.debug(f"Validación de roles requeridos ({len(roles_required)}): {roles_required}")
+         
         # Preparar datos del software
+        logger.debug("Preparando datos para actualización")
         software_data_dict = _prepare_software_data_for_update(software_data)
         
         # Crear software en base de datos
-        logger.info("Preparando creación del software en base de datos")
+        logger.debug("Preparando creación en base de datos")
         new_software = SoftwareCreate(**software_data_dict)   
-        logger.info(f"Objeto SoftwareCreate preparado: {new_software}")
+        logger.debug(f"Objeto SoftwareCreate preparado: {new_software}")
         
-        logger.info("Ejecutando creación del software en base de datos")
+        logger.debug("Llamando a create_software_use_case")
         software_created = create_software_use_case(db, new_software)
         if not software_created:
             logger.error("Fallo en la creación del software - Resultado nulo")
             raise HTTPException(status_code=500, detail="Error interno al crear el software")
         
-        logger.info(f"Software creado exitosamente - ID: {software_created.id}, Nombre: {software_created.name}")
+        logger.info(f"Software creado - ID: {software_created.id}, Nombre: {software_created.name}")
         
         # Asignar roles al software
+        logger.debug(f"Asignando roles al software ID: {software_created.id}")
         roles = _assign_roles_to_software(db, software_created.id, software_created.name, roles_required)
         
         software_created.roles = roles
@@ -198,8 +201,9 @@ def create_software_service(db: Session, software_data: SoftwareCreateRequest):
 
 
 def update_software_service(db: Session, software_id: str, software_data: SoftwareCreateRequest):
+    logger.debug(f"Entrando a update_software_service con ID={software_id}, datos: {software_data.dict()}")
     logger.info(f"Iniciando actualización de software - ID: {software_id}, Nombre: {getattr(software_data, 'name', 'N/A')}")
-    logger.info(f"Datos de entrada para actualización: {software_data}")
+    logger.debug(f"Datos de entrada para actualización: {software_data}")
     
     try:
         # Obtener el software actual con todas sus conexiones
@@ -209,27 +213,27 @@ def update_software_service(db: Session, software_id: str, software_data: Softwa
             logger.error(f"Software con ID {software_id} no encontrado")
             raise HTTPException(status_code=404, detail=f"Software con ID {software_id} no encontrado")
         
-        logger.info(f"Software encontrado - Nombre: {current_software.name}")
+        logger.debug(f"Software encontrado - ID: {software_id}, Nombre: {current_software.name}")
         
         # Obtener roles actuales del software
         current_roles = _get_current_software_roles(current_software)
         
         # Obtener nuevos roles requeridos
         new_roles_required = set(software_data.roles_required) if software_data.roles_required else set()
-        logger.info(f"Nuevos roles requeridos ({len(new_roles_required)}): {new_roles_required}")
+        logger.debug(f"Nuevos roles requeridos ({len(new_roles_required)}): {new_roles_required}")
         
         # Preparar datos del software para actualización
         software_data_dict = _prepare_software_data_for_update(software_data)
         
         # Actualizar información básica del software
-        logger.info("Actualizando información básica del software")
+        logger.debug("Actualizando datos básicos del software")
         software_update = SoftwareUpdate(**software_data_dict)
         updated_software = update_software_use_case(db, software_id, software_update)
         if not updated_software:
             logger.error("Fallo en la actualización del software - Resultado nulo")
             raise HTTPException(status_code=500, detail="Error interno al actualizar el software")
         
-        logger.info(f"Información básica del software actualizada exitosamente")
+        logger.info(f"Software básico actualizado - ID: {software_id}")
         
         # Actualizar roles del software
         roles_removed_count, roles_added_count = _update_software_roles(
@@ -237,7 +241,7 @@ def update_software_service(db: Session, software_id: str, software_data: Softwa
         )
         
         # Obtener el software actualizado con todos los roles
-        logger.info("Obteniendo software actualizado con roles finales")
+        logger.debug("Obteniendo datos finales del software")
         final_software = get_software_by_id_use_case(db, software_id)
         
         # Resumen de la operación
@@ -254,7 +258,7 @@ def update_software_service(db: Session, software_id: str, software_data: Softwa
         
         if hasattr(final_software, 'roles') and final_software.roles:
             final_role_labels = [r.label for r in final_software.roles]
-            logger.info(f"Roles finales: {final_role_labels}")
+            logger.debug(f"Roles finales: {final_role_labels}")
         
         return final_software
         
