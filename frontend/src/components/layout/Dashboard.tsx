@@ -1,13 +1,14 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "../organism/Sidebar";
 import useSessionChecker from "@/hooks/useSessionChecker";
+import { showErrorToast } from "@/utils/toast";
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
 
   useSessionChecker({
     onSessionInValid: () => {
-      console.error("Session is invalid or expired.");
+      showErrorToast("Sesión expirada, por favor inicia sesión nuevamente.", "error-session-expired");
       navigate("/");
     }
   });

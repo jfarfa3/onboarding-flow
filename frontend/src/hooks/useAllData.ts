@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import type { User } from "@/types/user";
 import type { Devices } from "@/types/devices";
 import type { Access } from "@/types/access";
+import { showErrorToast } from "@/utils/toast";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -74,8 +75,8 @@ export function useAllData() {
         setAccessPending(
           access.filter((acc) => acc.state_request?.label === "Pendiente")
         );
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      } catch {
+        showErrorToast("Error al cargar los datos", "error-fetch-data");
       }
     }
 

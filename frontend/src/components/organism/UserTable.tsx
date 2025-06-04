@@ -4,7 +4,7 @@ import type { FieldConfig } from "@/types/input";
 import { useEffect, useState } from "react";
 import { useRoleRequest } from "@/hooks/useRole";
 import type { User } from "@/types/user";
-import { createUser } from "@/services/user";
+import { createUser, updateUser } from "@/services/user";
 import { showErrorToast } from "@/utils/toast";
 import useRolesStore from '@/store/roleStore';
 import type { Devices } from '@/types/devices';
@@ -14,6 +14,7 @@ import { useSoftwareRequest } from '@/hooks/useSoftware';
 import { useAllData } from '@/hooks/useAllData';
 import { createAccessByRol } from '@/services/access';
 import DynamicFilterTable from './DynamicFilterTable';
+import type { Access } from '@/types/access';
 
 const columnsTemplate: DynamicColumns<User>[] = [
   {
@@ -131,7 +132,7 @@ const columnsTemplate: DynamicColumns<User>[] = [
         </div>
       ),
     type: "checkbox",
-    key: "isActive",
+    key: "is_active",
     extractor: (item) => item.is_active,
     editable: true,
     toCreate: false,
@@ -181,15 +182,15 @@ const filterOptions: FieldConfig[] = [
 
 export default function UserTable() {
   const [columns, setColumns] = useState<DynamicColumns<User>[]>(columnsTemplate);
-  const {rolesOptions} = useRoleRequest();
-  const {software} = useSoftwareRequest();
+  const { rolesOptions } = useRoleRequest();
+  const { software } = useSoftwareRequest();
   const { roles } = useRolesStore();
   const { stateRequest } = useStateRequest();
   const { users, setUsers } = useAllData();
 
   useEffect(() => {
     const updatedColumns = columnsTemplate.map(col => {
-      if (col.key === "role" && col.type === "select") {
+      if (col.key === "role_id" && col.type === "select") {
         return { ...col, options: rolesOptions };
       }
       return col;
@@ -211,16 +212,22 @@ export default function UserTable() {
     try {
       const userCreated = await createUser(newUser)
       userCreated.role = roles.find(role => role.id === userCreated.role_id) || undefined;
-      const newDeviceRequest: Devices = {
-        user_id: userCreated.id || "",
-        state_request_id: stateRequest.find(sr => sr.label === "Pendiente")?.id || "",
+      let deviceRequestCreated: Devices | null = null;
+      if (data.devices) {
+        const newDeviceRequest: Devices = {
+          user_id: userCreated.id || "",
+          state_request_id: stateRequest.find(sr => sr.label === "Pendiente")?.id || "",
+        }
+        deviceRequestCreated = await createDeviceRequest(newDeviceRequest);
       }
-      const deviceRequestCreated = await createDeviceRequest(newDeviceRequest);
-      const accessRequestCreated = await createAccessByRol(userCreated.id || "", userCreated.role_id, software, stateRequest.find(sr => sr.label === "Pendiente")?.id || "");
+      let accessRequestCreated: Access[] | null = null;
+      if (data.access) {
+        accessRequestCreated = await createAccessByRol(userCreated.id || "", userCreated.role_id, software, stateRequest.find(sr => sr.label === "Pendiente")?.id || "");
+      }
       const userDetail: User = {
         ...userCreated,
-        devices: [deviceRequestCreated],
-        access: accessRequestCreated,
+        devices: deviceRequestCreated ? [deviceRequestCreated] : [],
+        access: accessRequestCreated || [],
       }
       setUsers([...users, userDetail]);
     } catch {
@@ -229,29 +236,37 @@ export default function UserTable() {
   }
 
   const handleEdit = async (data: User, item: User) => {
-    console.log("Edit user data:", data, "for item:", item);
-    // try {
-      // TODO:Aquí debes implementar tu lógica para actualizar el usuario (PATCH o PUT)
-    //   const updatedUsersDetail = usersDetail.map(detail => {
-    //     if (detail.user.id === data.id) {
-    //       return {
-    //         ...detail,
-    //         user: {
-    //           ...detail.user,
-    //           name: data.name,
-    //           email: data.email,
-    //           area: data.area,
-    //           team: data.team,
-    //           role_id: data.role,
-    //         },
-    //       };
-    //     }
-    //     return detail;
-    //   });
-    //   setUsersDetail(updatedUsersDetail);
-    // } catch {
-    //   showErrorToast("Error al editar el usuario", "edit-user-error");
-    // }
+    const userToUpdate: Partial<User> = {
+      name: data.name as string,
+      area: data.area as string,
+      team: data.team as string,
+      role_id: data.role_id as string,
+      is_active: data.is_active as boolean,
+    }
+    if (item.name === userToUpdate.name &&
+      item.area === userToUpdate.area &&
+      item.team === userToUpdate.team &&
+      item.role_id === userToUpdate.role_id &&
+      item.is_active === userToUpdate.is_active) {
+      return;
+    }
+    try {
+      const userUpdated = await updateUser(userToUpdate, item.id);
+      userUpdated.role = roles.find(role => role.id === userUpdated.role_id) || undefined;
+      const updatedUsers = users.map(user =>
+        user.id === userUpdated.id
+          ? {
+            ...user,
+            ...userUpdated,
+            devices: user.devices,
+            access: user.access,
+          }
+          : user
+      );
+      setUsers(updatedUsers);
+    } catch {
+      showErrorToast("Error al actualizar el usuario", "update-user-error");
+    }
   };
 
   return (

@@ -3,10 +3,11 @@ import Div from "../atoms/Div";
 import type { Software } from "@/types/software";
 import { useEffect, useState } from "react";
 import { useRoleRequest } from "@/hooks/useRole";
-import { createSoftwareRequest } from "@/services/software";
+import { createSoftwareRequest, updateSoftwareRequest } from "@/services/software";
 import { useSoftwareRequest } from "@/hooks/useSoftware";
 import { showErrorToast } from "@/utils/toast";
 import DynamicFilterTable from "../organism/DynamicFilterTable";
+import type { FieldConfig } from "@/types/input";
 
 const softwareColumnsTemplate: DynamicColumns<Software>[] = [
   {
@@ -68,10 +69,49 @@ const softwareColumnsTemplate: DynamicColumns<Software>[] = [
   }
 ];
 
+const softwareFilterOptions: FieldConfig[] = [
+  {
+    type: "select",
+    label: "Filtrar y ordenar por",
+    name: "sortBy",
+    id: "sortBy",
+    placeholder: "Selecciona una opción",
+    options: [
+      { value: "name", label: "Nombre" },
+      { value: "description", label: "Descripción" },
+      { value: "url", label: "URL" },
+      { value: "is_active", label: "Activo" },
+    ],
+    state: "default",
+  },
+  {
+    type: "text",
+    label: "Texto a filtrar",
+    name: "filterText",
+    id: "filterText",
+    placeholder: "Ingresa un texto para filtrar",
+    state: "default",
+  },
+  {
+    type: "select",
+    label: "Ordenar por",
+    name: "order",
+    id: "order",
+    placeholder: "Selecciona un orden",
+    options: [
+      { value: "asc", label: "Ascendente" },
+      { value: "desc", label: "Descendente" },
+    ],
+    state: "default",
+  }
+];
+
 export default function ConfigPage() {
   const [softwareColumns, setSoftwareColumns] = useState<DynamicColumns<Software>[]>(softwareColumnsTemplate);
   const { rolesOptions } = useRoleRequest();
   const { software, setSoftware } = useSoftwareRequest();
+  const normalizeRoles = (roles?: string[]) => [...(roles || [])].sort();
+
 
   useEffect(() => {
     const updatedColumns = softwareColumns.map(column => {
@@ -83,24 +123,44 @@ export default function ConfigPage() {
       }
       return column;
     });
+
     setSoftwareColumns(updatedColumns);
-  }, [rolesOptions]);
+  }, [rolesOptions, setSoftwareColumns]);
 
   const saveSoftware = async (data: Software) => {
     try {
-      console.log("Saving software:", data);
       const softwareCreated = await createSoftwareRequest(data);
       setSoftware([...software, softwareCreated]);
-    } catch (error) {
-      console.error("Error creating software:", error);
+    } catch {
       showErrorToast("Error al crear el software", "create-software-error");
     }
   };
 
-  const editSoftware = async (data: Software, originalItem: Software) => {
-    console.log("Edit software functionality not implemented yet", data, originalItem);
-  }
+  const editSoftware = async (data: Software, item: Software) => {
+    const softwareToUpdate: Partial<Software> = {
+      name: data.name,
+      description: data.description,
+      url: data.url,
+      is_active: data.is_active,
+      roles_required: data.roles_required,
+    };
 
+    if (item.name === data.name &&
+      item.description === data.description &&
+      item.url === data.url &&
+      item.is_active === data.is_active &&
+      JSON.stringify(normalizeRoles(item.roles_required)) === JSON.stringify(normalizeRoles(data.roles_required))
+    ) {
+      return;
+    }
+
+    try {
+      const updatedSoftware = await updateSoftwareRequest(softwareToUpdate, item.id);
+      setSoftware(software.map(item => item.id === updatedSoftware.id ? updatedSoftware : item));
+    } catch {
+      showErrorToast("Error al actualizar el software", "update-software-error");
+    }
+  }
 
   return (
     <Div>
@@ -110,7 +170,7 @@ export default function ConfigPage() {
         <DynamicFilterTable
           baseRequests={software}
           columns={softwareColumns}
-          filterOptions={[]}
+          filterOptions={softwareFilterOptions}
           defaultSortBy="name"
           allowAddNew={true}
           onSave={saveSoftware}

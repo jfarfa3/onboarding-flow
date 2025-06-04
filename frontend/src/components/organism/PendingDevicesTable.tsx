@@ -22,10 +22,6 @@ const columns: DynamicColumns<Devices>[] = [
     )
   },
   {
-    header: "Modelo",
-    accessor: (item) => item.model ?? "-"
-  },
-  {
     header: "Estado",
     accessor: () => "Pendiente",
   }

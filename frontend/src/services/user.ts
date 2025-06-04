@@ -8,3 +8,13 @@ export async function createUser(user: User): Promise<User> {
     method: "POST",
   });
 }
+
+export async function updateUser(user: Partial<User>, userId?: string): Promise<User> {
+  if (!userId) {
+    throw new Error("User ID is required for update");
+  }
+  return httpRequest<Partial<User>, User>(`${API_BASE}users/${userId}`, user, {
+    method: "PUT",
+  });
+}
+

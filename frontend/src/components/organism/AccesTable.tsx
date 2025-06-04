@@ -1,5 +1,4 @@
 import { useStateRequest } from "@/hooks/useStateRequest";
-import { createAccessRequest } from "@/services/access";
 import useAccessStore from "@/store/accessStore";
 import type { Access } from "@/types/access";
 import type { DynamicColumns } from "@/types/dynamicTable";
@@ -7,6 +6,7 @@ import type { FieldConfig } from "@/types/input";
 import { showErrorToast } from "@/utils/toast";
 import { BadgeAlert, BadgeCheck, ShieldCheck } from "lucide-react";
 import DynamicFilterTable from "./DynamicFilterTable";
+import { updateStateAccessRequest } from "@/services/access";
 
 const accessColumnsTemplate: DynamicColumns<Access>[] = [
   {
@@ -85,27 +85,44 @@ export default function AccessTable() {
   const { access, setAccess } = useAccessStore();
   const { stateRequest } = useStateRequest();
 
-  const handleSaveAccess = async (data: any) => {
-
-    const newAccess: Access = {
-      user_id: data.user_id || "",
-      software_id: data.software_id || "",
-      state_request_id: stateRequest.find(sr => sr.label === "Pendiente")?.id || "",
-    };
-    try {
-      const accessCreated = await createAccessRequest(newAccess);
-      setAccess([...access, accessCreated]);
-    } catch {
-      showErrorToast("Error al crear la solicitud de acceso", "create-access-error");
+  const sendUpdateAccessRequest = async (stateLabel: string, accessId?: string,) => {
+    const newStateRequest = stateRequest.find(
+      (state) => state.label === stateLabel
+    );
+    if (!newStateRequest || !newStateRequest.id) {
+      showErrorToast("Estado 'Aprobada' no encontrado", 'error-state-not-found');
+      return;
     }
+    if (!accessId) {
+      showErrorToast("ID de acceso no encontrado", 'error-access-id-not-found');
+      return;
+    }
+    try {
+      await updateStateAccessRequest(accessId, newStateRequest.id);
+      const updatedAccess = access.map((item) =>
+        item.id === accessId
+          ? { ...item, state_request: newStateRequest, state_request_id: newStateRequest.id }
+          : item
+      );
+      setAccess(updatedAccess);
+    } catch {
+      showErrorToast("Error al actualizar la solicitud de acceso", 'error-access-update');
+    }
+  }
+
+  const handleAccessRejected = async (item: Access) => {
+    await sendUpdateAccessRequest("Rechazada", item.id);
+  }
+
+  const handleAccessCreated = async (item: Access) => {
+    await sendUpdateAccessRequest("Aprobada", item.id);
   };
   return (
     <DynamicFilterTable
       baseRequests={access}
       columns={accessColumnsTemplate}
       filterOptions={accessFilterOptions}
-      defaultSortBy="user.name"
-      onSave={handleSaveAccess}
+      defaultSortBy="state_request.label"
       allowAddNew={false}
       allowEdit={false}
       actions={(item) =>
@@ -114,7 +131,7 @@ export default function AccessTable() {
             <button
               className="p-2 bg-green-500 text-white hover:bg-green-600 rounded"
               onClick={() => {
-                // TODO: lógica para aprobar acceso
+                handleAccessCreated(item);
               }}
             >
               Creado
@@ -122,7 +139,7 @@ export default function AccessTable() {
             <button
               className="p-2 bg-red-500 text-white hover:bg-red-600 rounded"
               onClick={() => {
-                // TODO: lógica para rechazar acceso
+                handleAccessRejected(item);
               }}
             >
               Solicitud Rechazada

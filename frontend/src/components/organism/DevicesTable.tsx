@@ -4,7 +4,7 @@ import type { DynamicColumns } from "@/types/dynamicTable";
 import useDevicesStore from '@/store/devicesStore';
 import type { FieldConfig } from '@/types/input';
 import DynamicFilterTable from './DynamicFilterTable';
-import { createDeviceRequest } from '@/services/devices';
+import { updateDeviceRequest } from '@/services/devices';
 import { useStateRequest } from '@/hooks/useStateRequest';
 import { showErrorToast } from '@/utils/toast';
 import { useEffect, useState } from 'react';
@@ -18,7 +18,7 @@ const deviceColumnsTemplate: DynamicColumns<Devices>[] = [
       </span>
     ),
     type: "text",
-    key: "user_id",
+    key: "user.name",
     extractor: (item) => item.user?.name || "",
     editable: false,
   },
@@ -50,7 +50,8 @@ const deviceColumnsTemplate: DynamicColumns<Devices>[] = [
     header: "Rol",
     accessor: (item) => item.user?.role?.label || "Sin rol asignado",
     type: "text",
-    key: "user_id",
+    key: "user.role.label",
+    extractor: (item) => item.user?.role?.label || "",
     editable: false,
   },
   {
@@ -75,7 +76,7 @@ const deviceColumnsTemplate: DynamicColumns<Devices>[] = [
         <span className="text-gray-500">Sin estado</span>
       ),
     type: "select",
-    key: "state_request",
+    key: "state_request_id",
     options: [],
     extractor: (item) => item.state_request?.id || "",
   },
@@ -135,27 +136,34 @@ export default function Devicetable() {
     setDeviceColumns(updateColumns);
   }, [stateRequestOptions]);
 
-
-  const handleSaveDevice = async (data: any) => {
-    const newDevice: Devices = {
-      serial_number: data.serial_number || "",
-      model: data.model || "",
-      system_operating: data.system_operating || "",
-      user_id: data.user_id || "",
-      state_request_id: stateRequest.find(sr => sr.label === "Pendiente")?.id || "",
-    };
-
-    try {
-      const deviceCreated = await createDeviceRequest(newDevice);
-      setDevices([...devices, deviceCreated]);
-    } catch {
-      showErrorToast("Error al crear la solicitud de equipo", "create-device-error");
+  const handleEditDevice = async (data: Devices, item: Devices) => {
+    const deviceToUpdate: Partial<Devices> = {
+      serial_number: data.serial_number,
+      model: data.model,
+      system_operating: data.system_operating,
+      state_request_id: data.state_request_id,
     }
-  };
-
-  const handleEditDevice = async (data: Devices, originalItem: Devices) => {
-    // TODO: Implement edit functionality if needed
-    console.log("Edit device functionality not implemented yet", data, originalItem);
+    if(item.serial_number === data.serial_number &&
+       item.model === data.model &&
+       item.system_operating === data.system_operating &&
+       item.state_request_id === data.state_request_id) {
+      return;
+    }
+    try {
+      const deviceUpdated = await updateDeviceRequest(deviceToUpdate, item.id);
+      deviceUpdated.state_request = stateRequest.find(sr => sr.id === deviceUpdated.state_request_id) || undefined;
+      const updatedDevices = devices.map((device) =>
+        device.id === deviceUpdated.id ? {
+          ...device,
+          ...deviceUpdated,
+          user: device.user
+          
+        } : device
+      );
+      setDevices(updatedDevices);
+    } catch {
+      showErrorToast("Error al actualizar el dispositivo", 'error-update-device');
+    }
   };
 
   return (
@@ -163,8 +171,7 @@ export default function Devicetable() {
       baseRequests={devices}
       columns={deviceColumns}
       filterOptions={deviceFilterOptions}
-      defaultSortBy="user.name"
-      onSave={handleSaveDevice}
+      defaultSortBy="state_request.label"
       onEdit={handleEditDevice}
       allowAddNew={false}
       allowEdit={true}

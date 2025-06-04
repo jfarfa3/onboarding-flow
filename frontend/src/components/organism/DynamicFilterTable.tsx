@@ -73,9 +73,7 @@ export default function DynamicFilterTable<T>({
       }
       setNewRecord(null);
       setEditingItem(null);
-    } catch (error) {
-      console.error("Error al guardar:", error);
-    }
+    } catch {/* empty */ }
   };
 
   useEffect(() => {
