@@ -6,7 +6,14 @@ const alg = "HS256";
 const secret = new TextEncoder().encode(JWT_SECRET);
 
 export async function generateJwt(user: User): Promise<string> {
-  const jwt = await new jose.SignJWT(user)
+  const payload = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role?.label,
+  };
+
+  const jwt = await new jose.SignJWT(payload)
     .setProtectedHeader({ alg })
     .setIssuedAt()
     .setIssuer("organization")

@@ -8,6 +8,7 @@ import { useSoftwareRequest } from "@/hooks/useSoftware";
 import { showErrorToast, showSuccessToast } from "@/utils/toast";
 import DynamicFilterTable from "../organism/DynamicFilterTable";
 import type { FieldConfig } from "@/types/input";
+import { usePermissions } from "@/hooks/usePermissions";
 
 const softwareColumnsTemplate: DynamicColumns<Software>[] = [
   {
@@ -164,6 +165,8 @@ export default function ConfigPage() {
     }
   }
 
+  const { canPerformAction } = usePermissions();
+
   return (
     <Div>
       <h1 className="text-2xl font-bold mb-4 text-black">Configuración</h1>
@@ -174,10 +177,11 @@ export default function ConfigPage() {
           columns={softwareColumns}
           filterOptions={softwareFilterOptions}
           defaultSortBy="name"
-          allowAddNew={true}
+          allowAddNew={canPerformAction("software", "create", undefined)}
           onSave={saveSoftware}
           onEdit={editSoftware}
           allowEdit={true}
+          canEditRow={() => canPerformAction("software", "update", undefined)}
         />
       </div>
     </Div>

@@ -4,4 +4,5 @@ export interface ItemSideBarProps {
   to: string;
   isActive?: boolean;
   showLabel?: boolean;
+  requiredPermission?: string[];
 }

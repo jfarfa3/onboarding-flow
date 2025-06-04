@@ -7,6 +7,7 @@ import { showErrorToast, showSuccessToast } from "@/utils/toast";
 import { BadgeAlert, BadgeCheck, ShieldCheck } from "lucide-react";
 import DynamicFilterTable from "./DynamicFilterTable";
 import { updateStateAccessRequest } from "@/services/access";
+import { usePermissions } from "@/hooks/usePermissions";
 
 const accessColumnsTemplate: DynamicColumns<Access>[] = [
   {
@@ -84,6 +85,14 @@ const accessFilterOptions: FieldConfig[] = [
 export default function AccessTable() {
   const { access, setAccess } = useAccessStore();
   const { stateRequest } = useStateRequest();
+  const { filterItemsByPermission, canPerformAction } = usePermissions();
+
+  const filteredAccess = filterItemsByPermission(
+    access,
+    "access",
+    "view",
+    (item) => item.user_id
+  );
 
   const sendUpdateAccessRequest = async (stateLabel: string, accessId?: string,) => {
     const newStateRequest = stateRequest.find(
@@ -97,6 +106,18 @@ export default function AccessTable() {
       showErrorToast("ID de acceso no encontrado", 'error-access-id-not-found');
       return;
     }
+
+    const accessItem = access.find(item => item.id === accessId);
+    if (!accessItem) {
+      showErrorToast("Acceso no encontrado", 'error-access-not-found');
+      return;
+    }
+    
+    if (!canPerformAction("access", "approve", accessItem.user_id)) {
+      showErrorToast("No tienes permiso para actualizar este acceso", 'error-access-unauthorized');
+      return;
+    }
+    
     try {
       await updateStateAccessRequest(accessId, newStateRequest.id);
       const updatedAccess = access.map((item) =>
@@ -114,25 +135,26 @@ export default function AccessTable() {
     } catch {
       showErrorToast("Error al actualizar la solicitud de acceso", 'error-access-update');
     }
-  }
+  };
 
   const handleAccessRejected = async (item: Access) => {
     await sendUpdateAccessRequest("Rechazada", item.id);
-  }
+  };
 
   const handleAccessCreated = async (item: Access) => {
     await sendUpdateAccessRequest("Aprobada", item.id);
   };
+  
   return (
     <DynamicFilterTable
-      baseRequests={access}
+      baseRequests={filteredAccess}
       columns={accessColumnsTemplate}
       filterOptions={accessFilterOptions}
       defaultSortBy="state_request.label"
-      allowAddNew={false}
+      allowAddNew={canPerformAction("access", "create", undefined)}
       allowEdit={false}
       actions={(item) =>
-        item.state_request?.label === "Pendiente" && (
+        item.state_request?.label === "Pendiente" && canPerformAction("access", "approve", item.user_id) ? (
           <div className="flex items-center space-x-2">
             <button
               className="p-2 bg-green-500 text-white hover:bg-green-600 rounded"
@@ -151,7 +173,7 @@ export default function AccessTable() {
               Solicitud Rechazada
             </button>
           </div>
-        )
+        ) : null
       }
     />
   );

@@ -8,6 +8,7 @@ import { updateDeviceRequest } from '@/services/devices';
 import { useStateRequest } from '@/hooks/useStateRequest';
 import { showErrorToast, showSuccessToast } from "@/utils/toast";
 import { useEffect, useState } from 'react';
+import { usePermissions } from "@/hooks/usePermissions";
 
 const deviceColumnsTemplate: DynamicColumns<Devices>[] = [
   {
@@ -123,60 +124,90 @@ const deviceFilterOptions: FieldConfig[] = [
 
 export default function Devicetable() {
   const { devices, setDevices } = useDevicesStore();
-  const { stateRequest, stateRequestOptions } = useStateRequest();
+  const { stateRequest } = useStateRequest();
+  const { filterItemsByPermission, canPerformAction } = usePermissions();
   const [deviceColumns, setDeviceColumns] = useState<DynamicColumns<Devices>[]>(deviceColumnsTemplate);
 
+  const filteredDevices = filterItemsByPermission(
+    devices, 
+    "equipment", 
+    "view", 
+    (item) => item.user_id
+  );
+
   useEffect(() => {
-    const updateColumns = deviceColumnsTemplate.map(column => {
-      if (column.key === "state_request", column.type === "select") {
-        return { ...column, options: stateRequestOptions };
+    if (!stateRequest.length) return;
+    
+    const stateRequestOptions = stateRequest.map(state => ({
+      value: state.id || "",
+      label: state.label || "",
+    }));
+
+    const updatedColumns = deviceColumnsTemplate.map(column => {
+      if (column.key === "state_request_id") {
+        return {
+          ...column,
+          options: stateRequestOptions,
+        };
       }
       return column;
     });
-    setDeviceColumns(updateColumns);
-  }, [stateRequestOptions]);
 
-  const handleEditDevice = async (data: Devices, item: Devices) => {
-    const deviceToUpdate: Partial<Devices> = {
-      serial_number: data.serial_number,
-      model: data.model,
-      system_operating: data.system_operating,
-      state_request_id: data.state_request_id,
-    }
-    if(item.serial_number === data.serial_number &&
-       item.model === data.model &&
-       item.system_operating === data.system_operating &&
-       item.state_request_id === data.state_request_id) {
+    setDeviceColumns(updatedColumns);
+  }, [stateRequest]);
+
+  const editDevice = async (updatedItem: Devices, original: Devices) => {
+    if (!original.id) return;
+
+    if (!canPerformAction("equipment", "update", original.user_id)) {
+      showErrorToast("No tienes permisos para editar este dispositivo", "permission-denied");
       return;
     }
+    
     try {
-      const deviceUpdated = await updateDeviceRequest(deviceToUpdate, item.id);
-      deviceUpdated.state_request = stateRequest.find(sr => sr.id === deviceUpdated.state_request_id) || undefined;
-      const updatedDevices = devices.map((device) =>
-        device.id === deviceUpdated.id ? {
-          ...device,
-          ...deviceUpdated,
-          user: device.user
-          
-        } : device
+      const device = {
+        ...original,
+        state_request_id: updatedItem.state_request_id || original.state_request_id,
+        serial_number: updatedItem.serial_number || original.serial_number,
+        model: updatedItem.model || original.model,
+        system_operating: updatedItem.system_operating || original.system_operating,
+      };
+
+      const deviceUpdated = await updateDeviceRequest(device);
+
+      const newStateRequest = stateRequest.find(
+        (state) => state.id === deviceUpdated.state_request_id
       );
-      setDevices(updatedDevices);
+
+      const updatedDevice = {
+        ...deviceUpdated,
+        state_request: newStateRequest,
+      };
+
+      const devicesUpdated = devices.map((item) =>
+        item.id === deviceUpdated.id ? updatedDevice : item
+      );
+
+      setDevices(devicesUpdated);
       showSuccessToast("Dispositivo actualizado correctamente");
     } catch {
-      showErrorToast("Error al actualizar el dispositivo", 'error-update-device');
+      showErrorToast("Error al actualizar el dispositivo", "device-update-error");
     }
   };
 
   return (
     <DynamicFilterTable
-      baseRequests={devices}
+      baseRequests={filteredDevices}
       columns={deviceColumns}
       filterOptions={deviceFilterOptions}
-      defaultSortBy="state_request.label"
-      onEdit={handleEditDevice}
-      allowAddNew={false}
+      defaultSortBy="user.name"
+      allowAddNew={canPerformAction("equipment", "create", undefined)}
+      onEdit={editDevice}
       allowEdit={true}
-      canEditRow={(item) => item.state_request?.label === "Pendiente"}
+      canEditRow={(item) => 
+        item.state_request?.label === "Pendiente" && 
+        canPerformAction("equipment", "update", item.user_id)
+      }
     />
   );
 }

@@ -3,9 +3,28 @@ import PendingDevicesTable from "../organism/PendingDevicesTable";
 import PendingAccessTable from "../organism/PendingAccessTable";
 import { useAllData } from "@/hooks/useAllData";
 import { generateStatCardsData } from "../molecules/generateStatCardsData";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import useSessionStore from "@/store/sessionStore";
 
 export default function Dashboard() {
   const { users, devices, access } = useAllData();
+  const { hasPermission, userId } = usePermissions();
+  const { sessionToken } = useSessionStore();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!sessionToken) return;
+    
+    const hasEditPermissions = hasPermission([
+      "equipment:approve:any", "access:approve:any"
+    ]);
+
+    if (!hasEditPermissions && userId) {
+      navigate(`/dashboard/user/${userId}`);
+    }
+  }, [sessionToken, hasPermission, userId, navigate]);
 
   const statCardsData = generateStatCardsData(
     users,

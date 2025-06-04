@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ArrowLeft, User, Mail, Building, Users, Shield, Monitor, Lock, CheckCircle, XCircle, Clock } from "lucide-react";
 import type { User as UserType } from "@/types/user";
@@ -12,6 +12,9 @@ import { createDeviceRequest } from "@/services/devices";
 import { createAccessRequest } from "@/services/access";
 import { showErrorToast, showSuccessToast } from "@/utils/toast";
 import Div from "../atoms/Div";
+import { usePermissions } from "@/hooks/usePermissions";
+import useSessionStore from "@/store/sessionStore";
+import PermissionGuard from "../atoms/PermissionGuard";
 
 export default function UserDetail() {
   const { userId } = useParams<{ userId: string }>();
@@ -23,6 +26,9 @@ export default function UserDetail() {
   const [isRequestingDevice, setIsRequestingDevice] = useState(false);
   const [isRequestingAccess, setIsRequestingAccess] = useState(false);
   const [selectedSoftware, setSelectedSoftware] = useState<string>("");
+  const { canPerformAction, userId: currentUserId } = usePermissions();
+  const { sessionToken } = useSessionStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const foundUser = users.find(u => u.id === userId);
@@ -40,8 +46,35 @@ export default function UserDetail() {
     }
   }, [userId, users, software]);
 
+  useEffect(() => {
+    const checkPermission = async () => {
+      if (!sessionToken || !userId) return;
+      
+      try {
+        if (currentUserId === userId) {
+          return;
+        }
+        
+        if (!canPerformAction("user", "view", userId)) {
+          showErrorToast("No tienes permiso para ver este perfil de usuario", "permission-denied");
+          navigate("/dashboard");
+        }
+      } catch {
+        showErrorToast("Error al verificar permisos", "permission-error");
+        navigate("/dashboard");
+      }
+    };
+    
+    checkPermission();
+  }, [sessionToken, userId, currentUserId, canPerformAction, navigate]);
+
   const handleRequestDevice = async () => {
     if (!user) return;
+        if (!canPerformAction("equipment", "create", user.id)) {
+      showErrorToast("No tienes permiso para solicitar dispositivos para este usuario", "permission-denied");
+      return;
+    }
+    
     setIsRequestingDevice(true);
     try {
       const pendingState = stateRequest.find(sr => sr.label === "Pendiente");
@@ -71,6 +104,10 @@ export default function UserDetail() {
 
   const handleRequestAccess = async () => {
     if (!user || !selectedSoftware) return;
+        if (!canPerformAction("access", "create", user.id)) {
+      showErrorToast("No tienes permiso para solicitar accesos para este usuario", "permission-denied");
+      return;
+    }
     setIsRequestingAccess(true);
     try {
       const pendingState = stateRequest.find(sr => sr.label === "Pendiente");
@@ -191,12 +228,18 @@ export default function UserDetail() {
                 <Monitor className="w-5 h-5" />
                 Equipos Asignados
               </h2>
-              <button
-                onClick={handleRequestDevice}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              <PermissionGuard 
+                permission={["equipment:create:self", "equipment:create:any"]} 
+                fallback={<span className="text-sm text-gray-500">Sin permisos para solicitar</span>}
               >
-                {isRequestingDevice ? "Solicitando..." : "Solicitar Equipo"}
-              </button>
+                <button
+                  onClick={handleRequestDevice}
+                  disabled={isRequestingDevice}
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                >
+                  {isRequestingDevice ? "Solicitando..." : "Solicitar Equipo"}
+                </button>
+              </PermissionGuard>
             </div>
             
             {user.devices && user.devices.length > 0 ? (
@@ -237,27 +280,32 @@ export default function UserDetail() {
                 Accesos a Aplicaciones
               </h2>
               {availableSoftware.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <select
-                    value={selectedSoftware}
-                    onChange={(e) => setSelectedSoftware(e.target.value)}
-                    className="border border-gray-300 rounded px-3 py-1 text-sm"
-                  >
-                    <option value="">Seleccionar aplicación</option>
-                    {availableSoftware.map((soft) => (
-                      <option key={soft.id} value={soft.id}>
-                        {soft.name}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    onClick={handleRequestAccess}
-                    disabled={isRequestingAccess || !selectedSoftware}
-                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                  >
-                    {isRequestingAccess ? "Solicitando..." : "Solicitar"}
-                  </button>
-                </div>
+                <PermissionGuard 
+                  permission={["access:create:self", "access:create:any"]}
+                  fallback={<span className="text-sm text-gray-500">Sin permisos para solicitar</span>}
+                >
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={selectedSoftware}
+                      onChange={(e) => setSelectedSoftware(e.target.value)}
+                      className="border border-gray-300 rounded px-3 py-1 text-sm"
+                    >
+                      <option value="">Seleccionar aplicación</option>
+                      {availableSoftware.map((soft) => (
+                        <option key={soft.id} value={soft.id}>
+                          {soft.name}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={handleRequestAccess}
+                      disabled={isRequestingAccess || !selectedSoftware}
+                      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    >
+                      {isRequestingAccess ? "Solicitando..." : "Solicitar"}
+                    </button>
+                  </div>
+                </PermissionGuard>
               )}
             </div>
             

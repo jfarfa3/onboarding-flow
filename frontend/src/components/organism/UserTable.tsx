@@ -16,6 +16,7 @@ import { createAccessByRol } from '@/services/access';
 import DynamicFilterTable from './DynamicFilterTable';
 import type { Access } from '@/types/access';
 import { useNavigate } from 'react-router-dom';
+import { usePermissions } from "@/hooks/usePermissions";
 
 const columnsTemplate: DynamicColumns<User>[] = [
   {
@@ -189,6 +190,7 @@ export default function UserTable() {
   const { stateRequest } = useStateRequest();
   const { users, setUsers } = useAllData();
   const navigate = useNavigate();
+  const { canPerformAction } = usePermissions();
 
   useEffect(() => {
     const updatedColumns = columnsTemplate.map(col => {
@@ -281,8 +283,9 @@ export default function UserTable() {
       defaultSortBy="user.name"
       onSave={handleSave}
       onEdit={handleEdit}
-      allowAddNew={true}
+      allowAddNew={canPerformAction("user", "create", undefined)}
       allowEdit={true}
+      canEditRow={(item) => canPerformAction("user", "update", item.id)}
       actions={(user) => (
         <button
           onClick={() => navigate(`/dashboard/user/${user.id}`)}

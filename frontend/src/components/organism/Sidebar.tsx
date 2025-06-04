@@ -14,33 +14,41 @@ import {
 import type { ItemSideBarProps } from "@/types/itemsSidebar";
 import ItemSideBar from "../molecules/ItemSideBar";
 import { showSuccessToast } from "@/utils/toast";
-const elementsSideBar: ItemSideBarProps[] = [
+import PermissionGuard from "@/components/atoms/PermissionGuard";
+
+const sidebarItems: ItemSideBarProps[] = [
   {
     icono: <LayoutDashboard className="w-5 h-5" />,
     title: "Dashboard",
     to: "/dashboard",
+    requiredPermission:[]
   },
   {
     icono: <User className="w-5 h-5" />,
     title: "Usuarios",
     to: "/dashboard/users",
+    requiredPermission: ["user:view:any"]
   },
   {
     icono: <Key className="w-5 h-5" />,
     title: "Accesos",
     to: "/dashboard/accesses",
+    requiredPermission: ["access:view:any", "access:view:self"]
   },
   {
     icono: <Monitor className="w-5 h-5" />,
     title: "Equipos",
     to: "/dashboard/devices",
+    requiredPermission: ["equipment:view:any", "equipment:view:self"]
+
   },
   {
     icono: <Cog className="w-5 h-5" />,
     title: "Configuración",
     to: "/dashboard/settings",
+    requiredPermission: ["software:view:any"],
   }
-]
+];
 
 export default function Sidebar() {
   const location = useLocation();
@@ -54,6 +62,7 @@ export default function Sidebar() {
     showSuccessToast("Sesión cerrada correctamente");
     navigate("/");
   };
+  
   return (
     <div className={`h-screen bg-white border-r flex flex-col flex-shrink-0 sticky top-0 overflow-y-auto ${isOpen ? "w-64" : "w-16 overflow-hidden"} transition-width duration-300`}>
       <div className={`w-full h-fit flex items-center border-b px-5 justify-between ${isOpen ? "flex-row" : "flex-col-reverse items-center"}`}>
@@ -79,20 +88,34 @@ export default function Sidebar() {
           <Menu className="w-6 h-6 text-blue-500" />
         </button>
       </div>
+      
       <nav className="flex-1 mt-5">
         {
-          elementsSideBar.map((item, index) => (
-            <button className="w-full" key={index}>
-              <ItemSideBar
-                key={index}
-                icono={item.icono}
-                title={item.title}
-                to={item.to}
-                isActive={location.pathname === item.to}
-                showLabel={isOpen}
-              />
-            </button>
-          ))
+          sidebarItems.map((item, index) => 
+            item.requiredPermission && item.requiredPermission.length > 0 ? (
+              <PermissionGuard key={index} permission={item.requiredPermission|| []}>
+                <button className="w-full">
+                  <ItemSideBar
+                    icono={item.icono}
+                    title={item.title}
+                    to={item.to}
+                    isActive={location.pathname === item.to}
+                    showLabel={isOpen}
+                  />
+                </button>
+              </PermissionGuard>
+            ) : (
+              <button className="w-full" key={index}>
+                <ItemSideBar
+                  icono={item.icono}
+                  title={item.title}
+                  to={item.to}
+                  isActive={location.pathname === item.to}
+                  showLabel={isOpen}
+                />
+              </button>
+            )
+          )
         }
       </nav>
       
@@ -110,5 +133,4 @@ export default function Sidebar() {
       </div>
     </div>
   );
-
 }

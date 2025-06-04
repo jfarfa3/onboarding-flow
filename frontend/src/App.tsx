@@ -8,6 +8,8 @@ import UserDetail from "@/components/pages/UserDetail";
 import ConfigPage from "./components/pages/Config";
 import Devices from "./components/pages/Devices";
 import Accesses from "./components/pages/Accesses";
+import NotFound from "./components/pages/NotFound";
+import ProtectedRoute from "./components/atoms/ProtectedRoute";
 
 export default function App() {
   return (
@@ -15,15 +17,37 @@ export default function App() {
       <ToastContainer />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route path="/dashboard" element={<ProtectedRoute requiredPermission={[]}><DashboardLayout /></ProtectedRoute>}>
           <Route index element={<Dashboard />} />
-          <Route path="users" element={<UsersPage />} />
-          <Route path="user/:userId" element={<UserDetail />} />
-          <Route path="devices" element={<Devices />} />
-          <Route path="accesses" element={<Accesses />} />
-          <Route path="settings" element={<ConfigPage />} />
-          <Route path="*" element={<Dashboard />} />
+          {/* Rutas protegidas con permisos específicos */}
+          <Route path="users" element={
+            <ProtectedRoute requiredPermission={["user:view:any"]}>
+              <UsersPage />
+            </ProtectedRoute>
+          } />
+          <Route path="user/:userId" element={
+            <ProtectedRoute requiredPermission={["user:view:any", "user:view:self"]}>
+              <UserDetail />
+            </ProtectedRoute>
+          } />
+          <Route path="devices" element={
+            <ProtectedRoute requiredPermission={["equipment:view:any", "equipment:view:self"]}>
+              <Devices />
+            </ProtectedRoute>
+          } />
+          <Route path="accesses" element={
+            <ProtectedRoute requiredPermission={["access:view:any", "access:view:self"]}>
+              <Accesses />
+            </ProtectedRoute>
+          } />
+          <Route path="settings" element={
+            <ProtectedRoute requiredPermission={["software:view:any"]}>
+              <ConfigPage />
+            </ProtectedRoute>
+          } />
+          <Route path="*" element={<NotFound />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   )
