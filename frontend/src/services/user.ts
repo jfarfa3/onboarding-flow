@@ -18,3 +18,9 @@ export async function updateUser(user: Partial<User>, userId?: string): Promise<
   });
 }
 
+export async function getUserById(userId: string): Promise<User> {
+  return httpRequest<null, User>(`${API_BASE}users/${userId}`, null, {
+    method: "GET",
+  });
+}
+

@@ -17,3 +17,7 @@ export function showErrorToast(message: string, id: string) {
     toastId: id,
   });
 }
+
+export function showSuccessToast(message: string) {
+  toast.success(message, toastOptions);
+}

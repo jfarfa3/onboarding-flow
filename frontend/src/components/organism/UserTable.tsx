@@ -1,11 +1,11 @@
-import { BadgeCheck, BadgeAlert, ShieldCheck } from 'lucide-react';
+import { BadgeCheck, BadgeAlert, ShieldCheck, Eye } from 'lucide-react';
 import type { DynamicColumns } from "@/types/dynamicTable";
 import type { FieldConfig } from "@/types/input";
 import { useEffect, useState } from "react";
 import { useRoleRequest } from "@/hooks/useRole";
 import type { User } from "@/types/user";
 import { createUser, updateUser } from "@/services/user";
-import { showErrorToast } from "@/utils/toast";
+import { showErrorToast, showSuccessToast } from "@/utils/toast";
 import useRolesStore from '@/store/roleStore';
 import type { Devices } from '@/types/devices';
 import { createDeviceRequest } from '@/services/devices';
@@ -15,6 +15,7 @@ import { useAllData } from '@/hooks/useAllData';
 import { createAccessByRol } from '@/services/access';
 import DynamicFilterTable from './DynamicFilterTable';
 import type { Access } from '@/types/access';
+import { useNavigate } from 'react-router-dom';
 
 const columnsTemplate: DynamicColumns<User>[] = [
   {
@@ -187,6 +188,7 @@ export default function UserTable() {
   const { roles } = useRolesStore();
   const { stateRequest } = useStateRequest();
   const { users, setUsers } = useAllData();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const updatedColumns = columnsTemplate.map(col => {
@@ -230,6 +232,7 @@ export default function UserTable() {
         access: accessRequestCreated || [],
       }
       setUsers([...users, userDetail]);
+      showSuccessToast("Usuario creado correctamente");
     } catch {
       showErrorToast("Error al crear el usuario", "create-user-error");
     }
@@ -264,6 +267,7 @@ export default function UserTable() {
           : user
       );
       setUsers(updatedUsers);
+      showSuccessToast("Usuario actualizado correctamente");
     } catch {
       showErrorToast("Error al actualizar el usuario", "update-user-error");
     }
@@ -279,6 +283,16 @@ export default function UserTable() {
       onEdit={handleEdit}
       allowAddNew={true}
       allowEdit={true}
+      actions={(user) => (
+        <button
+          onClick={() => navigate(`/dashboard/user/${user.id}`)}
+          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 flex items-center gap-1"
+          title="Ver detalle"
+        >
+          <Eye className="w-4 h-4" />
+          Ver
+        </button>
+      )}
     />
   )
 }

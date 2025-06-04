@@ -3,7 +3,7 @@ import useAccessStore from "@/store/accessStore";
 import type { Access } from "@/types/access";
 import type { DynamicColumns } from "@/types/dynamicTable";
 import type { FieldConfig } from "@/types/input";
-import { showErrorToast } from "@/utils/toast";
+import { showErrorToast, showSuccessToast } from "@/utils/toast";
 import { BadgeAlert, BadgeCheck, ShieldCheck } from "lucide-react";
 import DynamicFilterTable from "./DynamicFilterTable";
 import { updateStateAccessRequest } from "@/services/access";
@@ -105,6 +105,12 @@ export default function AccessTable() {
           : item
       );
       setAccess(updatedAccess);
+      
+      if (stateLabel === "Aprobada") {
+        showSuccessToast("Solicitud de acceso aprobada correctamente");
+      } else {
+        showSuccessToast("Solicitud de acceso rechazada");
+      }
     } catch {
       showErrorToast("Error al actualizar la solicitud de acceso", 'error-access-update');
     }

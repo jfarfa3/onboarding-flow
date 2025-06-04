@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRoleRequest } from "@/hooks/useRole";
 import { createSoftwareRequest, updateSoftwareRequest } from "@/services/software";
 import { useSoftwareRequest } from "@/hooks/useSoftware";
-import { showErrorToast } from "@/utils/toast";
+import { showErrorToast, showSuccessToast } from "@/utils/toast";
 import DynamicFilterTable from "../organism/DynamicFilterTable";
 import type { FieldConfig } from "@/types/input";
 
@@ -114,7 +114,7 @@ export default function ConfigPage() {
 
 
   useEffect(() => {
-    const updatedColumns = softwareColumns.map(column => {
+    const updatedColumns = softwareColumnsTemplate.map(column => {
       if (column.key === "roles_required" && (column.type === "select" || column.type === "multi-select")) {
         return {
           ...column,
@@ -125,12 +125,13 @@ export default function ConfigPage() {
     });
 
     setSoftwareColumns(updatedColumns);
-  }, [rolesOptions, setSoftwareColumns]);
+  }, [rolesOptions]);
 
   const saveSoftware = async (data: Software) => {
     try {
       const softwareCreated = await createSoftwareRequest(data);
       setSoftware([...software, softwareCreated]);
+      showSuccessToast("Software creado correctamente");
     } catch {
       showErrorToast("Error al crear el software", "create-software-error");
     }
@@ -157,6 +158,7 @@ export default function ConfigPage() {
     try {
       const updatedSoftware = await updateSoftwareRequest(softwareToUpdate, item.id);
       setSoftware(software.map(item => item.id === updatedSoftware.id ? updatedSoftware : item));
+      showSuccessToast("Software actualizado correctamente");
     } catch {
       showErrorToast("Error al actualizar el software", "update-software-error");
     }

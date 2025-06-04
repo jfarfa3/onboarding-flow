@@ -6,7 +6,7 @@ import type { FieldConfig } from '@/types/input';
 import DynamicFilterTable from './DynamicFilterTable';
 import { updateDeviceRequest } from '@/services/devices';
 import { useStateRequest } from '@/hooks/useStateRequest';
-import { showErrorToast } from '@/utils/toast';
+import { showErrorToast, showSuccessToast } from "@/utils/toast";
 import { useEffect, useState } from 'react';
 
 const deviceColumnsTemplate: DynamicColumns<Devices>[] = [
@@ -161,6 +161,7 @@ export default function Devicetable() {
         } : device
       );
       setDevices(updatedDevices);
+      showSuccessToast("Dispositivo actualizado correctamente");
     } catch {
       showErrorToast("Error al actualizar el dispositivo", 'error-update-device');
     }
