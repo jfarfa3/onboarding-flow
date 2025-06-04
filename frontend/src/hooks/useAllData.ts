@@ -19,14 +19,14 @@ export function useAllData() {
     async function fetchData() {
       try {
         const allUsers = await httpRequest<null, User[]>(
-          `${API_URL}users`,
+          `${API_URL}users/`,
           null,
           {
             method: "GET",
           }
         );
         const devices = await httpRequest<null, Devices[]>(
-          `${API_URL}devices`,
+          `${API_URL}devices/`,
           null,
           {
             method: "GET",
@@ -34,7 +34,7 @@ export function useAllData() {
         );
 
         const access = await httpRequest<null, Access[]>(
-          `${API_URL}access`,
+          `${API_URL}access/`,
           null,
           {
             method: "GET",
