@@ -141,9 +141,6 @@ export default function UserDetail() {
     );
   }
 
-  const hasActiveDevice = user.devices?.some(d => d.state_request?.label === "Aprobada");
-  const hasPendingDevice = user.devices?.some(d => d.state_request?.label === "Pendiente");
-
   return (
     <Div>
       <div className="p-6 text-black">
@@ -194,15 +191,12 @@ export default function UserDetail() {
                 <Monitor className="w-5 h-5" />
                 Equipos Asignados
               </h2>
-              {!hasActiveDevice && !hasPendingDevice && (
-                <button
-                  onClick={handleRequestDevice}
-                  disabled={isRequestingDevice}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                >
-                  {isRequestingDevice ? "Solicitando..." : "Solicitar Equipo"}
-                </button>
-              )}
+              <button
+                onClick={handleRequestDevice}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              >
+                {isRequestingDevice ? "Solicitando..." : "Solicitar Equipo"}
+              </button>
             </div>
             
             {user.devices && user.devices.length > 0 ? (

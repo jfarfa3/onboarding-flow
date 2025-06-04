@@ -1,6 +1,7 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Letter from "@/components/atoms/Letter";
 import useSidebarStore from "@/store/sidebarStore";
+import useSessionStore from "@/store/sessionStore";
 import {
   LayoutDashboard,
   User,
@@ -8,9 +9,11 @@ import {
   Monitor,
   Cog,
   Menu,
+  LogOut,
 } from "lucide-react";
 import type { ItemSideBarProps } from "@/types/itemsSidebar";
 import ItemSideBar from "../molecules/ItemSideBar";
+import { showSuccessToast } from "@/utils/toast";
 const elementsSideBar: ItemSideBarProps[] = [
   {
     icono: <LayoutDashboard className="w-5 h-5" />,
@@ -41,8 +44,16 @@ const elementsSideBar: ItemSideBarProps[] = [
 
 export default function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { toggleSidebar, isOpen } = useSidebarStore();
+  const { clearSessionToken } = useSessionStore();
   const logo = ["ON", "F"];
+
+  const handleLogout = () => {
+    clearSessionToken();
+    showSuccessToast("Sesión cerrada correctamente");
+    navigate("/");
+  };
   return (
     <div className={`h-screen bg-white border-r flex flex-col flex-shrink-0 sticky top-0 overflow-y-auto ${isOpen ? "w-64" : "w-16 overflow-hidden"} transition-width duration-300`}>
       <div className={`w-full h-fit flex items-center border-b px-5 justify-between ${isOpen ? "flex-row" : "flex-col-reverse items-center"}`}>
@@ -84,6 +95,20 @@ export default function Sidebar() {
           ))
         }
       </nav>
+      
+      {/* Logout button at the bottom */}
+      <div className="mb-4 px-2">
+        <button
+          onClick={handleLogout}
+          className={`w-full flex items-center gap-2 p-2 rounded text-red-500 font-medium hover:bg-red-50 transition-colors duration-200 ${
+            !isOpen ? "justify-center" : ""
+          }`}
+          title="Cerrar sesión"
+        >
+          <LogOut className="w-5 h-5" />
+          {isOpen && <span>Cerrar sesión</span>}
+        </button>
+      </div>
     </div>
   );
 
