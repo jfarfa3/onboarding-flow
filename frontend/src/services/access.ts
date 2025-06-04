@@ -32,7 +32,7 @@ export async function createAccessByRol(
 }
 
 export async function createAccessRequest(access: Access): Promise<Access> {
-  return httpRequest<Access, Access>(`${API_URL}access`, access, {
+  return httpRequest<Access, Access>(`${API_URL}access/`, access, {
     method: "POST",
   });
 }
