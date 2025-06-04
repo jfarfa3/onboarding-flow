@@ -1,11 +1,7 @@
-name = "onboarding-flow"       # <-- cambia esto por el nombre correcto (ej: onboarding-flow)
-
+name = "onboarding-flow"
 compatibility_date = "2025-06-04"
-
 account_id = "68bab1ae6cdf49539c9546477b8c3f83"
-
 workers_dev = true
 
 [site]
 bucket = "./dist"
-entry-point = "."
