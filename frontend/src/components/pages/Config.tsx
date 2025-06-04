@@ -178,7 +178,6 @@ export default function ConfigPage() {
           onSave={saveSoftware}
           onEdit={editSoftware}
           allowEdit={true}
-          canEditRow={(item) => item.is_active}
         />
       </div>
     </Div>
