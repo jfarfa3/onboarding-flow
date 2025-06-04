@@ -4,12 +4,12 @@ from sqlalchemy.orm import Session
 from app.infrastructure.database.database import get_db
 from app.domain.schemas.device import DeviceCreate, DeviceUpdate, DeviceResponse
 from app.application.use_cases.device_use_case import (
-    create_device_use_case,
     get_all_devices_use_case,
     get_device_by_id_use_case,
     update_device_use_case,
     delete_device_use_case,
 )
+from app.application.services.device_service import create_device_service, update_device_status_service
 from app.config.logger import get_logger
 
 logger = get_logger("routers.device")
@@ -20,8 +20,8 @@ router = APIRouter(prefix="/devices", tags=["Devices"])
 def add_device(device_data: DeviceCreate, db: Session = Depends(get_db)):
     logger.debug(f"Route add_device called with data: {device_data.dict()}")
     try:
-        logger.debug("Calling create_device_use_case")
-        return create_device_use_case(db, device_data)
+        logger.debug("Calling create_device_service")
+        return create_device_service(db, device_data)
     except Exception as e:
         logger.error(f"Error adding device: {e}")
         raise HTTPException(status_code=400, detail=str(e))
@@ -50,8 +50,8 @@ def get_device(device_id: str, db: Session = Depends(get_db)):
 def update_device(device_id: str, device_data: DeviceUpdate, db: Session = Depends(get_db)):
     logger.debug(f"Route update_device called with id: {device_id}, data: {device_data.dict(exclude_unset=True)}")
     try:
-        logger.debug("Calling update_device_use_case")
-        return update_device_use_case(db, device_id, device_data)
+        logger.debug("Calling update_device_status_service")
+        return update_device_status_service(db, device_id, device_data)
     except Exception as e:
         logger.error(f"Error updating device: {e}")
         raise HTTPException(status_code=400, detail=str(e))

@@ -10,7 +10,6 @@ class Role(Base, TimestampMixin):
 
     label = Column(String, nullable=False, unique=False)
 
-    # Relación many-to-many con Software
     software = relationship(
         "Software",
         secondary=software_roles,

@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from uuid import UUID as UUIDType
 from datetime import datetime
 from typing import Optional
-from app.domain.schemas.state_request import StateRequestResponse  # Assuming StateRequestResponse is defined elsewhere
+from app.domain.schemas.state_request import StateRequestResponse
 
 
 class DeviceBase(BaseModel):

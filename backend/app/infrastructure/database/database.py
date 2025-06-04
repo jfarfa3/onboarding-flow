@@ -30,7 +30,7 @@ def init_db():
     import app.domain.models.state_request
     import app.domain.models.software_roles
 
-    Base.metadata.drop_all(bind=engine) # Uncomment this line to drop all tables before creating them again to reset the database in development
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     from app.infrastructure.database.init_data import load_all_initial_data
 

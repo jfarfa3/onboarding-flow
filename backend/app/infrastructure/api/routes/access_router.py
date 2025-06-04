@@ -7,7 +7,7 @@ from app.application.use_cases.access_use_case import (
     create_access_use_case, get_all_accesses_use_case,
     get_access_by_id_use_case, update_access_use_case, delete_access_use_case
 )
-from app.application.services.access_service import update_access_status_service
+from app.application.services.access_service import update_access_status_service, create_access_service
 from app.config.logger import get_logger
 
 logger = get_logger("routers.access")
@@ -18,8 +18,8 @@ router = APIRouter(prefix="/access", tags=["Access"])
 def add_access(access_data: AccessCreate, db: Session = Depends(get_db)):
     logger.debug(f"Route add_access called with data: {access_data.dict()}")
     try:
-        logger.debug("Calling create_access_use_case")
-        return create_access_use_case(db, access_data)
+        logger.debug("Calling create_access_service")
+        return create_access_service(db, access_data)
     except Exception as e:
         logger.error(f"Error adding access: {e}")
         raise HTTPException(status_code=400, detail=str(e))

@@ -7,14 +7,13 @@ from typing import Optional
 
 class CustomFormatter(logging.Formatter):
 
-    # Códigos de colores ANSI
     COLORS = {
-        'DEBUG': '\033[36m',     # Cyan
-        'INFO': '\033[32m',      # Verde
-        'WARNING': '\033[33m',   # Amarillo
-        'ERROR': '\033[31m',     # Rojo
-        'CRITICAL': '\033[35m',  # Magenta
-        'RESET': '\033[0m'       # Reset
+        'DEBUG': '\033[36m',
+        'INFO': '\033[32m',
+        'WARNING': '\033[33m',
+        'ERROR': '\033[31m',
+        'CRITICAL': '\033[35m',
+        'RESET': '\033[0m'
     }
 
     def format(self, record):

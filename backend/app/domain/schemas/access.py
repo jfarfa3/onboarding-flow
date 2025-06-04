@@ -3,7 +3,7 @@ from uuid import UUID as UUIDType
 from datetime import datetime
 from typing import Optional
 from app.domain.schemas.software import SoftwareResponse
-from app.domain.schemas.state_request import StateRequestResponse  # Assuming StateRequestResponse is defined elsewhere
+from app.domain.schemas.state_request import StateRequestResponse
 
 class AccessBase(BaseModel):
     user_id: UUIDType
@@ -26,7 +26,7 @@ class AccessResponse(AccessBase):
     created_at: datetime
     updated_at: datetime
     software: SoftwareResponse
-    state_request: StateRequestResponse  # Assuming StateRequestResponse is defined elsewhere
+    state_request: StateRequestResponse
 
     class Config:
         from_attributes = True

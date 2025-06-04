@@ -133,7 +133,6 @@ def insert_default_software(db):
 
     extended_software = []
     for item in default_software:
-        # Generar variantes
         extended_software.append(item)
         extended_software.append({**item, "name": f"{item['name']} Staging", "url": f"{item['url']}/staging"})
         extended_software.append({**item, "name": f"{item['name']} QA", "url": f"{item['url']}/qa"})
@@ -148,7 +147,7 @@ def insert_default_software(db):
             is_active=software_data["is_active"]
         )
         db.add(software)
-        db.flush()  # Necesario para obtener el ID
+        db.flush()
 
         for role_label in software_data["roles_required"]:
             role_id = role_mapping.get(role_label)
