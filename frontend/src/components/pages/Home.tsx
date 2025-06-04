@@ -17,7 +17,7 @@ export default function Home() {
 
   return (
     <Div>
-      <div className="bg-white rounded-lg shadow-md p-8 w-full max-w-fit">
+      <div className="bg-white rounded-lg p-8 w-full">
         <div className="flex flex-row items-center justify-center gap-2">
           {onboarding.map((letter, index) => (
             <Letter
