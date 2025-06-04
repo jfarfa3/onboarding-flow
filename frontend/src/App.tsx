@@ -19,7 +19,6 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<ProtectedRoute requiredPermission={[]}><DashboardLayout /></ProtectedRoute>}>
           <Route index element={<Dashboard />} />
-          {/* Rutas protegidas con permisos específicos */}
           <Route path="users" element={
             <ProtectedRoute requiredPermission={["user:view:any"]}>
               <UsersPage />
