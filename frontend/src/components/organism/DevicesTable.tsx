@@ -201,7 +201,7 @@ export default function Devicetable() {
       columns={deviceColumns}
       filterOptions={deviceFilterOptions}
       defaultSortBy="user.name"
-      allowAddNew={canPerformAction("equipment", "create", undefined)}
+      allowAddNew={false}
       onEdit={editDevice}
       allowEdit={true}
       canEditRow={(item) => 

@@ -151,7 +151,7 @@ export default function AccessTable() {
       columns={accessColumnsTemplate}
       filterOptions={accessFilterOptions}
       defaultSortBy="state_request.label"
-      allowAddNew={canPerformAction("access", "create", undefined)}
+      allowAddNew={false}
       allowEdit={false}
       actions={(item) =>
         item.state_request?.label === "Pendiente" && canPerformAction("access", "approve", item.user_id) ? (
