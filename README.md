@@ -297,10 +297,23 @@ Se crean más de 30 usuarios de prueba con diferentes roles, áreas y equipos, i
 5. **Estados de Solicitudes**: Seguimiento del flujo de aprobaciones
 6. **Filtros y Búsquedas**: Herramientas para encontrar información rápidamente
 
+## 🔒 Sistema de Autenticación y Permisos
+
+La aplicación implementa un sistema de control de acceso basado en roles (RBAC) con las siguientes características:
+
+- **Autenticación JWT**: Inicio de sesión seguro mediante tokens que incluyen información del usuario y rol
+- **Protección de Rutas**: Componente `ProtectedRoute` que verifica permisos antes de permitir acceso a cada vista
+- **Permisos Granulares**: Sistema de permisos con formato `<recurso>:<acción>:<ámbito>` (ej. "user:view:self")
+- **Hooks Personalizados**: `useSessionChecker` y `usePermissions` para validar sesiones y verificar permisos
+- **Control por Componente**: Verificación de permisos a nivel de componente para mostrar/ocultar funcionalidades
+- **Almacenamiento Persistente**: Gestión de sesión con Zustand que persiste entre recargas
+
+El sistema distingue entre acciones sobre recursos propios ("self") y recursos de otros usuarios ("any"), permitiendo un control preciso según el rol del usuario.
+
 ## 🔮 Mejoras Futuras
 
 ### Funcionalidades Pendientes:
-- **Autenticación y Autorización**: Implementar JWT y roles de acceso
+- ~~**Autenticación y Autorización**: Implementar JWT y roles de acceso~~ ✅ Implementado
 - **Notificaciones**: Sistema de notificaciones en tiempo real
 - **Flujos de Aprobación**: Workflow configurable para aprobaciones
 - **Integración con LDAP/AD**: Sincronización con directorio activo
@@ -333,4 +346,4 @@ Se crean más de 30 usuarios de prueba con diferentes roles, áreas y equipos, i
 
 ---
 
-**Desarrollado con ❤️ para optimizar el proceso de onboarding empresarial**
+**Desarrollado con ❤️ por [juancadev](https://github.com/jfarfa3)**
