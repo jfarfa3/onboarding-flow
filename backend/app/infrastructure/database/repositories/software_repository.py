@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.domain.models.software import Software
 from app.domain.schemas.software import SoftwareUpdate
 
@@ -12,7 +12,12 @@ def get_all_software(db: Session):
     return db.query(Software).all()
 
 def get_software_by_id(db: Session, software_id: str):
-    return db.query(Software).filter(Software.id == software_id).first()
+    return (
+        db.query(Software)
+        .options(joinedload(Software.roles))
+        .filter(Software.id == software_id)
+        .first()
+    )
 
 def update_software(db: Session, software_id: str, software_data: SoftwareUpdate):
     software = get_software_by_id(db, software_id)

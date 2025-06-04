@@ -11,9 +11,14 @@ class SoftwareBase(BaseModel):
     is_active: bool = True
 
 
-class SoftwareRequest(SoftwareBase):
+class SoftwareCreateRequest(SoftwareBase):
     url: AnyHttpUrl
     roles_required: Optional[List[UUIDType]]
+
+
+class SoftwareUpdateRequest(SoftwareBase):
+    url: Optional[AnyHttpUrl] = None
+    roles_required: Optional[List[UUIDType]] = None
 
 
 class SoftwareCreate(SoftwareBase):
@@ -23,13 +28,11 @@ class SoftwareCreate(SoftwareBase):
 class SoftwarePatch(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
-    url: Optional[AnyHttpUrl] = None
     is_active: Optional[bool] = None
-    roles_required: Optional[List[UUIDType]] = None
 
 
 class SoftwareUpdate(SoftwarePatch):
-    pass
+    url: str
 
 
 class SoftwareResponse(SoftwareBase):

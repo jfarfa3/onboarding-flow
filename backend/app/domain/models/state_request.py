@@ -8,4 +8,4 @@ class StateRequest(Base, TimestampMixin):
     label = Column(String, nullable=False)
 
     def __repr__(self):
-        return f"<StateRequest(id={self.id}, state='{self.state}', label='{self.label}')>"
+        return f"<StateRequest(id={self.id} label='{self.label}')>"

@@ -7,6 +7,7 @@ from app.application.use_cases.access_use_case import (
     create_access_use_case, get_all_accesses_use_case,
     get_access_by_id_use_case, update_access_use_case, delete_access_use_case
 )
+from app.application.services.access_service import update_access_status_service
 from app.config.logger import get_logger
 
 logger = get_logger("routers.access")
@@ -51,4 +52,13 @@ def delete_access(access_id: str, db: Session = Depends(get_db)):
         delete_access_use_case(db, access_id)
     except Exception as e:
         logger.error(f"Error deleting access: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+    
+@router.patch("/{access_id}/{new_status}", response_model=AccessResponse, description="Update the status of an access record")
+def update_access_status(access_id: str, new_status: str, db: Session = Depends(get_db)):
+    try:
+        return update_access_status_service(db, access_id, new_status)
+        
+    except Exception as e:
+        logger.error(f"Error updating access status: {e}")
         raise HTTPException(status_code=400, detail=str(e))
