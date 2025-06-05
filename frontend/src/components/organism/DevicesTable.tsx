@@ -173,7 +173,7 @@ export default function Devicetable() {
         system_operating: updatedItem.system_operating || original.system_operating,
       };
 
-      const deviceUpdated = await updateDeviceRequest(device);
+      const deviceUpdated = await updateDeviceRequest(device, original.id);
 
       const newStateRequest = stateRequest.find(
         (state) => state.id === deviceUpdated.state_request_id
