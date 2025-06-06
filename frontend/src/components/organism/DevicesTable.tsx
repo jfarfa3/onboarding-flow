@@ -189,7 +189,7 @@ export default function Devicetable() {
       );
 
       setDevices(devicesUpdated);
-      showSuccessToast("Dispositivo actualizado correctamente");
+      showSuccessToast("Dispositivo actualizado correctamente", "device-update-success");
     } catch {
       showErrorToast("Error al actualizar el dispositivo", "device-update-error");
     }

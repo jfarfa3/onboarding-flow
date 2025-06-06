@@ -132,7 +132,7 @@ export default function ConfigPage() {
     try {
       const softwareCreated = await createSoftwareRequest(data);
       setSoftware([...software, softwareCreated]);
-      showSuccessToast("Software creado correctamente");
+      showSuccessToast("Software creado correctamente", "create-software-success");
     } catch {
       showErrorToast("Error al crear el software", "create-software-error");
     }
@@ -159,7 +159,7 @@ export default function ConfigPage() {
     try {
       const updatedSoftware = await updateSoftwareRequest(softwareToUpdate, item.id);
       setSoftware(software.map(item => item.id === updatedSoftware.id ? updatedSoftware : item));
-      showSuccessToast("Software actualizado correctamente");
+      showSuccessToast("Software actualizado correctamente", "update-software-success");
     } catch {
       showErrorToast("Error al actualizar el software", "update-software-error");
     }

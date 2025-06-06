@@ -59,7 +59,7 @@ export default function Sidebar() {
 
   const handleLogout = () => {
     clearSessionToken();
-    showSuccessToast("Sesión cerrada correctamente");
+    showSuccessToast("Sesión cerrada correctamente", "logout-success");
     navigate("/");
   };
   
