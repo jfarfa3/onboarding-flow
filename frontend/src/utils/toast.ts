@@ -18,6 +18,16 @@ export function showErrorToast(message: string, id: string) {
   });
 }
 
-export function showSuccessToast(message: string) {
-  toast.success(message, toastOptions);
+export function showSuccessToast(message: string, id: string) {
+  toast.success(message, {
+    ...toastOptions,
+    toastId: id,
+  })
+}
+
+export function showInfoToast(message: string, id: string) {
+  toast.info(message, {
+    ...toastOptions,
+    toastId: id,
+  });
 }

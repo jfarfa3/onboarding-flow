@@ -128,9 +128,9 @@ export default function AccessTable() {
       setAccess(updatedAccess);
       
       if (stateLabel === "Aprobada") {
-        showSuccessToast("Solicitud de acceso aprobada correctamente");
+        showSuccessToast("Solicitud de acceso aprobada correctamente", 'success-access-approved');
       } else {
-        showSuccessToast("Solicitud de acceso rechazada");
+        showSuccessToast("Solicitud de acceso rechazada", 'success-access-rejected');
       }
     } catch {
       showErrorToast("Error al actualizar la solicitud de acceso", 'error-access-update');
