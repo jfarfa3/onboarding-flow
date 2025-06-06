@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "@/components/pages/Home";
+import HomePage from "@/components/pages/HomePage";
 import Dashboard from "@/components/pages/Dashboard";
 import { ToastContainer } from "react-toastify";
 import DashboardLayout from "@/components/layout/Dashboard";
@@ -16,7 +16,7 @@ export default function App() {
     <BrowserRouter>
       <ToastContainer />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/dashboard" element={<ProtectedRoute requiredPermission={[]}><DashboardLayout /></ProtectedRoute>}>
           <Route index element={<Dashboard />} />
           <Route path="users" element={

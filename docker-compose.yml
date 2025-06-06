@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: password
     volumes:
       - onboarding_flow-db-data:/var/lib/postgresql/data
-      - ./init-db.sql:/docker-entrypoint-initdb.d/init-dbs.sql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     container_name: onboarding_flow-db
     networks:
       - onboarding-network
