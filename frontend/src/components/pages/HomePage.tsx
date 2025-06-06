@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Div from "../atoms/Div";
 import useSessionChecker from "@/hooks/useSessionChecker";
 
-export default function Home() {
+export default function HomePage() {
   const navigate = useNavigate();
   const onboarding = ["ON", "B", "O", "A", "R", "D", "I", "N", "G"];
   const flow = ["F", "L", "O", "W"];
