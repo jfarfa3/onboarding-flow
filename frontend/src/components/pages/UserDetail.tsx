@@ -94,7 +94,7 @@ export default function UserDetail() {
       const updatedUsers = users.map(u => u.id === user.id ? updatedUser : u);
       setUsers(updatedUsers);
       
-      showSuccessToast("Solicitud de equipo creada correctamente");
+      showSuccessToast("Solicitud de equipo creada correctamente", 'device-request-success');
     } catch {
       showErrorToast("Error al crear la solicitud de equipo", "device-request-error");
     } finally {
@@ -143,7 +143,7 @@ export default function UserDetail() {
       setAvailableSoftware(available);
       setSelectedSoftware("");
       
-      showSuccessToast("Solicitud de acceso creada correctamente");
+      showSuccessToast("Solicitud de acceso creada correctamente", 'access-request-success');
     } catch {
       showErrorToast("Error al crear la solicitud de acceso", "access-request-error");
     } finally {

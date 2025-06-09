@@ -234,7 +234,7 @@ export default function UserTable() {
         access: accessRequestCreated || [],
       }
       setUsers([...users, userDetail]);
-      showSuccessToast("Usuario creado correctamente");
+      showSuccessToast("Usuario creado correctamente", "create-user-success");
     } catch {
       showErrorToast("Error al crear el usuario", "create-user-error");
     }
@@ -269,7 +269,7 @@ export default function UserTable() {
           : user
       );
       setUsers(updatedUsers);
-      showSuccessToast("Usuario actualizado correctamente");
+      showSuccessToast("Usuario actualizado correctamente", "update-user-success");
     } catch {
       showErrorToast("Error al actualizar el usuario", "update-user-error");
     }
